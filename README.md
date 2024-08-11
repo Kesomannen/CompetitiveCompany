@@ -51,3 +51,53 @@ All configuration is done via a normal `.cfg` file. All options except those in 
   - Make it so only one team can select the next moon to go to. This will be configurable to either be the losers pick or cycle through the teams.
 - [ ] Better team management
   - Add a new ship object to view and manage the state of the game instead of using the terminal.
+
+## Using the API
+
+This mod exposes an API for other mods to interact with. All classes and methods are documented with XML comments. Here's a couple of quick examples:
+
+```csharp
+using CompetitiveCompany.Game;
+
+// item that shows the position of all enemies when activated
+public class XRayItem : GrabbableObject {
+    public override void ItemActivate(bool used, bool buttonDown = true) {
+        if (!used) return;
+
+        var localTeam = Player.Local.Team;
+        if (localTeam == null) return;
+
+        foreach (var player in Session.Current.Players) {
+            if (player.Team == localTeam) continue;
+
+            var position = player.transform.position;
+            var username = player.Controller.playerUsername;
+            Debug.Log($"Enemy {username} is at {position}");
+
+            // draw an indicator at the enemy's position
+        }
+    }
+}
+```
+
+```csharp
+using CompetitiveCompany.Game;
+
+// only allow combat inside of the facility
+[BepInPlugin(...)]
+public class Plugin : BaseUnityPlugin {
+    void Awake() {
+        Session.OnSessionStarted += OnSessionStarted;
+    }
+
+    void OnSessionStarted() {
+        Session.Current.Combat.AddPredicate((attacker, victim) => {
+            if (!attacker.Controller.isInsideFactory) {
+                return DamagePredicateResult.Deny("PvP is only allowed inside the facility");
+            }
+
+            return DamagePredicateResult.Allow();
+        });
+    }
+}
+```
