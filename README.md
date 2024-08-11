@@ -9,10 +9,10 @@ _Sign up now to secure your future with the Company!_
 This mod is a rewrite and continuation of [Competitive Company](https://thunderstore.io/c/lethal-company/p/agmas/CompetitiveCompany/) by agmas.
 It features a new game mode, where teams of players compete to collect the most amount of scrap within a set number of days. Credits are automatically added as you collect scrap and there's no quota to worry about.
 
-> ![IMPORTANT]
+> [!IMPORTANT]
 > All players are required to have the mod installed.
 
-> ![NOTE]
+> [!NOTE]
 > The gamemode cannot be toggled off; i.e. to play the base game you have to disable the mod.
 
 ## Recommended Mods
