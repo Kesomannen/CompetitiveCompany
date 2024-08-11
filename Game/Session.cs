@@ -250,7 +250,7 @@ public class Session : NetworkBehaviour {
 
     void SyncSettings() {
         Log.Debug("Syncing settings");
-        _settings.Value = NetworkedSettings.FromConfig(Plugin.Config);
+        _settings.Value = new NetworkedSettings(Plugin.Config);
     }
 
     DamagePredicateResult IsPlayingPredicate(Player attacker, Player victim) {

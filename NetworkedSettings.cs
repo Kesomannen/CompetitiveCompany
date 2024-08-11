@@ -2,14 +2,14 @@
 
 namespace CompetitiveCompany;
 
-public struct NetworkedSettings : INetworkSerializable {
-    public bool FriendlyFire;
-    public int NumberOfRounds;
-    public float ShipSafeRadius;
+public struct NetworkedSettings(Config config) : INetworkSerializable {
+    public bool FriendlyFire = config.FriendlyFire.Value;
+    public int NumberOfRounds = config.NumberOfRounds.Value;
+    public float ShipSafeRadius = config.ShipSafeRadius.Value;
 
-    public Permission JoinTeamPerm;
-    public Permission CreateAndDeleteTeamPerm;
-    public Permission EditTeamPerm;
+    public Permission JoinTeamPerm = config.JoinTeamPerm.Value;
+    public Permission CreateAndDeleteTeamPerm = config.CreateAndDeleteTeamPerm.Value;
+    public Permission EditTeamPerm = config.EditTeamPerm.Value;
     
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
         serializer.SerializeValue(ref FriendlyFire);
@@ -21,15 +21,4 @@ public struct NetworkedSettings : INetworkSerializable {
         serializer.SerializeValue(ref EditTeamPerm);
     }
 
-    public static NetworkedSettings FromConfig(Config config) {
-        return new NetworkedSettings {
-            FriendlyFire = config.FriendlyFire.Value,
-            NumberOfRounds = config.NumberOfRounds.Value,
-            ShipSafeRadius = config.ShipSafeRadius.Value,
-            
-            JoinTeamPerm = config.JoinTeamPerm.Value,
-            CreateAndDeleteTeamPerm = config.CreateAndDeleteTeamPerm.Value,
-            EditTeamPerm = config.EditTeamPerm.Value
-        };
-    }
 }
