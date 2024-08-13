@@ -8,6 +8,7 @@ namespace CompetitiveCompany;
 internal static class Assets {
     public static AssetBundle Bundle { get; }
     public static RoundReport RoundReportPrefab { get; }
+    public static Material TeamSuitMaterial { get; }
     
     static Assets() {
         var path = Assembly.GetExecutingAssembly().Location;
@@ -16,8 +17,10 @@ internal static class Assets {
         
         Bundle = AssetBundle.LoadFromFile(path);
         
-        var prefab = Bundle.LoadAsset<GameObject>("Assets/Prefabs/RoundReport.prefab");
+        var prefab = Bundle.LoadAsset<GameObject>("Assets/CC2/Prefabs/RoundReport.prefab");
         RoundReportPrefab = prefab.GetComponent<RoundReport>();
+        
+        TeamSuitMaterial = Bundle.LoadAsset<Material>("Assets/CC2/Materials/TeamSuit.mat");
     }
     
     public static void Load() {

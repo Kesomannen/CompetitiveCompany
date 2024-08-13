@@ -42,7 +42,7 @@ internal class TeamPerformancePage : MonoBehaviour {
         }
         
         _gradeText.text = CalculateGrade(localTeam);
-        _collectedText.text = $"${localTeam.RoundScore}\n${RoundManager.Instance.totalScrapValueInLevel}";
+        _collectedText.text = $"{localTeam.RoundScore}\n{RoundManager.Instance.totalScrapValueInLevel}";
     }
 
     static string CalculateGrade(Team team) {

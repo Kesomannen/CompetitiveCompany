@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CompetitiveCompany.Game;
 using CompetitiveCompany.Util;
@@ -107,7 +108,7 @@ internal class TerminalCommands {
         TerminalCommand("set-team-color", clearText: true),
         CommandInfo("Set the color of your current team, in hex format", "<color>")
     ]
-    string ColorCommand([RemainingText] string hex) {
+    string ColorCommand([RemainingText] string input) {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
         if (!CheckPerms(settings => settings.EditTeamPerm)) return NoPermsMessage;
 
@@ -117,12 +118,36 @@ internal class TerminalCommands {
             return "You are not in a team!";
         }
 
-        if (!ColorUtility.TryParseHtmlString(hex, out var color)) {
-            return "Invalid color format! Please use hex format (e.g. #FF0000).";
+        var color = ParseColor(input);
+        if (color == null) {
+            return $"Invalid color! Please use hex format (e.g. #FF0000) or one of the following: {string.Join(", ", _colorNames)}.";
         }
 
-        team.SetColorServerRpc(color);
-        return $"Set color of team {team.Name} to {hex}.";
+        team.SetColorServerRpc(color.Value);
+        return $"Set color of team {team.Name} to <color={ColorUtility.ToHtmlStringRGB(color.Value)}>{input}</color>.";
+    }
+    
+    static readonly Dictionary<string, Color> _colorNames = new() {
+        { "red", Color.red },
+        { "green", Color.green },
+        { "blue", Color.blue },
+        { "yellow", Color.yellow },
+        { "cyan", Color.cyan },
+        { "magenta", Color.magenta },
+        { "white", Color.white },
+        { "black", Color.black }
+    };
+
+    static Color? ParseColor(string str) {
+        if (_colorNames.TryGetValue(str, out var color)) {
+            return color;
+        }
+        
+        if (ColorUtility.TryParseHtmlString(str, out color)) {
+            return color;
+        }
+        
+        return null;
     }
 
     [

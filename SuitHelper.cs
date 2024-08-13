@@ -24,7 +24,7 @@ public static class SuitHelper {
             canBeStored = original.canBeStored,
             maxNumber = original.maxNumber,
             hasBeenUnlockedByPlayer = original.hasBeenUnlockedByPlayer,
-            suitMaterial = Object.Instantiate(original.suitMaterial),
+            suitMaterial = original.suitMaterial,
             headCostumeObject = original.headCostumeObject,
             lowerTorsoCostumeObject = original.lowerTorsoCostumeObject,
             alreadyUnlocked = original.alreadyUnlocked,

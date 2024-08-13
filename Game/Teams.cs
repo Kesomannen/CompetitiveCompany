@@ -33,7 +33,7 @@ public class Teams : IReadOnlyList<Team> {
     /// </summary>
     public bool TryGet(string name, StringComparison comparison, [NotNullWhen(true)] out Team? team) {
         foreach (var t in _list) {
-            if (t.Name.Equals(name, comparison)) continue;
+            if (!t.Name.Equals(name, comparison)) continue;
 
             team = t;
             return true;
@@ -63,58 +63,77 @@ public class Teams : IReadOnlyList<Team> {
         /*
          * * ============================================ *
          * | Team      | Round Score    | Total Score     |
-         * * -------------------------------------------- *
+         * * --------- * -------------- * --------------- *
          * | Team 1    | 100            | 1000            |
          * | Team 2    | 200            | 2000            |
          * | Team 3    | 300            | 3000            |
-         * * ============================================ *
+         * * ========= * ============== * =============== *
          */
 
-        yield return CreateLine('=');
+        var teamNames = _list.Select(team => {
+            var length = team.RawName.Length;
+            var name = color ? team.ColoredName : team.Name;
+
+            if (Player.Local.Team == team) {
+                name = "> " + name;
+                length += 2;
+            }
+
+            return (Name: name, DisplayedLength: length);
+        }).ToArray();
         
-        var nameLength = Mathf.Max(4, _list.Max(team => team.RawName.Length));
-        var roundScoreLength = Mathf.Max(12, _list.Max(team => team.RoundScore.ToString().Length));
-        var totalScoreLength = Mathf.Max(12, _list.Max(team => team.TotalScore.ToString().Length));
+        var nameColWidth = Mathf.Max(4, teamNames.Max(name => name.DisplayedLength));
+        var roundScoreColWidth = Mathf.Max(12, _list.Max(team => team.RoundScore.ToString().Length));
+        var totalScoreColWidth = Mathf.Max(12, _list.Max(team => team.TotalScore.ToString().Length));
         
-        var availableSpace = width - 7 - nameLength - roundScoreLength - totalScoreLength;
+        var availableSpace = width - 7 - nameColWidth - roundScoreColWidth - totalScoreColWidth;
 
         if (availableSpace < 0) {
             Log.Warning("Not enough space to print teams");
         } else {
-            roundScoreLength += availableSpace / 3;
+            roundScoreColWidth += availableSpace / 3;
             availableSpace -= availableSpace / 3;
 
-            totalScoreLength += availableSpace / 2;
+            totalScoreColWidth += availableSpace / 2;
             availableSpace -= availableSpace / 2;
         
-            nameLength += availableSpace;
+            nameColWidth += availableSpace;
         }
         
+        yield return CreateLine('=');
+        
         yield return CreateRow(
-            ("Team", nameLength),
-            ("Round Score", roundScoreLength),
-            ("Total Score", totalScoreLength)
+            ("Team", nameColWidth, null),
+            ("Round Score", roundScoreColWidth, null),
+            ("Total Score", totalScoreColWidth, null)
         );
         
         yield return CreateLine('-');
         
-        foreach (var team in _list) {
+        for (var i = 0; i < _list.Count; i++) {
+            var team = _list[i];
+
             yield return CreateRow(
-                (color ? team.ColoredName : team.RawName, nameLength),
-                (team.RoundScore, roundScoreLength),
-                (team.TotalScore, totalScoreLength)
+                (teamNames[i].Name, nameColWidth, teamNames[i].DisplayedLength),
+                (team.RoundScore, roundScoreColWidth, null),
+                (team.TotalScore, totalScoreColWidth, null)
             );
         }
-        
+
         yield return CreateLine('=');
 
         yield break;
 
-        string CreateRow(params (object, int)[] cols) {
+        string CreateRow(params (object, int, int?)[] cols) {
             var row = new StringBuilder();
 
-            foreach (var (content, len) in cols) {
-                row.Append($"| {content.ToString().PadRight(len)}");
+            foreach (var (content, targetLength, displayedLength) in cols) {
+                var str = content.ToString();
+                var diff = targetLength - (displayedLength ?? str.Length);
+                
+                row.Append("| ");
+                row.Append(str);
+                row.Append(' ', diff);
             }
             
             row.Append("|");

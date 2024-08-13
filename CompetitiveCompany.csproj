@@ -5,6 +5,9 @@
         <Nullable>enable</Nullable>
         <LangVersion>12.0</LangVersion>
         <AssemblyName>CompetitiveCompany</AssemblyName>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <DebugSymbols>true</DebugSymbols>
         <DebugType>embedded</DebugType>
     </PropertyGroup>

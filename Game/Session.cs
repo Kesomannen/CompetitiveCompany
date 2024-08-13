@@ -337,12 +337,6 @@ public class Session : NetworkBehaviour {
                 HUDManager.Instance.DisplayTip("Not allowed to damage player!", result.Reason, isWarning: true);
             }
         };
-
-        On.Terminal.LoadNewNodeIfAffordable += (orig, self, node) => {
-            Log.Info($"LoadNewNodeIfAffordable called. buyRerouteToMoon: {node.buyRerouteToMoon}");
-            
-            orig(self, node);
-        };
         
         _refuseCompanyMoonNode = ScriptableObject.CreateInstance<TerminalNode>();
         _refuseCompanyMoonNode.displayText = "Company moon is disabled by CompetitiveCompany.";
@@ -365,10 +359,12 @@ public class Session : NetworkBehaviour {
                 x => x.MatchLdfld<Terminal>(nameof(Terminal.groupCredits)),
                 x => x.MatchCallvirt<StartOfRound>(nameof(StartOfRound.ChangeLevelServerRpc))
             );
+
+            var target = c.Next;
             
             /*
              * if (node.buyRerouteToMoon == 3) {
-             *     this.LoadNewNode();
+             *     this.LoadNewNode(Session._refuseCompanyMoonNode);
              *     return;
              * }
              */
@@ -377,10 +373,10 @@ public class Session : NetworkBehaviour {
             c.Emit(OpCodes.Ldarg_1);
             // buyRerouteToMoon
             c.Emit(OpCodes.Ldfld, AccessTools.Field(typeof(TerminalNode), nameof(TerminalNode.buyRerouteToMoon)));
-            // 3
+            // 3 -- id of company moon
             c.Emit(OpCodes.Ldc_I4_3);
             // if (node.buyRerouteToMoon != 3) goto next
-            c.Emit(OpCodes.Bne_Un_S, c.Next);
+            c.Emit(OpCodes.Bne_Un_S, target);
             
             // this
             c.Emit(OpCodes.Ldarg_0);

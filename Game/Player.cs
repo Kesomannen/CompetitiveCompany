@@ -147,7 +147,6 @@ public class Player : NetworkBehaviour {
 
         if (IsOwner) {
             // only do this for the local player
-            PlayerLog($"Subscribed to team {team.RawName} credits change event", LogLevel.Debug);
             team.OnCreditsChanged += OnTeamCreditsChanged;
             OnTeamCreditsChanged(team.Credits);
         }
@@ -162,7 +161,6 @@ public class Player : NetworkBehaviour {
         team.MembersInternal.Remove(this);
 
         if (IsOwner) {
-            PlayerLog($"Unsubscribed from team {team.RawName} credits change event", LogLevel.Debug);
             team.OnCreditsChanged -= OnTeamCreditsChanged;
         }
         
@@ -177,8 +175,8 @@ public class Player : NetworkBehaviour {
         Controller.usernameBillboardText.text = $"({current}) {Controller.playerUsername}";
     }
 
-    void OnTeamCreditsChanged(int credits) {
-        PlayerLog($"Credits changed: {credits}", LogLevel.Debug);
+    static void OnTeamCreditsChanged(int credits) {
+        Log.Debug($"Credits changed: {credits}");
         TerminalUtil.Instance.groupCredits = credits;
     }
     

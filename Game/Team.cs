@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using CompetitiveCompany.Util;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CompetitiveCompany.Game;
 
@@ -74,7 +76,11 @@ public class Team : NetworkBehaviour, ITeam {
     /// </summary>
     public int Credits {
         get => _credits.Value;
-        set => _credits.Value = value;
+        set {
+            Log.Debug($"{RawName}: Setting credits to {value}");
+            
+            _credits.Value = value;
+        } 
     }
     
     /// <summary>
@@ -104,6 +110,8 @@ public class Team : NetworkBehaviour, ITeam {
     public string ColoredName => $"<color=#{ColorUtility.ToHtmlStringRGB(Color)}>{RawName}</color>";
 
     Session _session = null!;
+    
+    static readonly int _normalMapID = Shader.PropertyToID("_NormalMap");
 
     public event Action<Color>? OnColorChanged;
     public event Action<string>? OnNameChanged; 
@@ -111,9 +119,11 @@ public class Team : NetworkBehaviour, ITeam {
     
     void Start() {
         Suit = SuitHelper.CreateSuit("CompetitiveCompanySuit", StartOfRound.Instance);
-        
-        SuitMaterial = Suit.suitMaterial;
-        SuitMaterial.mainTexture = null;
+
+        SuitMaterial = Instantiate(Assets.TeamSuitMaterial);
+        SuitMaterial.mainTexture = Suit.suitMaterial.mainTexture;
+        SuitMaterial.SetTexture(_normalMapID, Suit.suitMaterial.GetTexture(_normalMapID));
+        Suit.suitMaterial = SuitMaterial;
         OnColorChangedHandler(default, Color);
         
         var unlockables = StartOfRound.Instance.unlockablesList.unlockables;
@@ -165,7 +175,7 @@ public class Team : NetworkBehaviour, ITeam {
     }
 
     /// <summary>
-    /// Deletes the team. Fails if there are still members in the team.
+    /// Deletes the team. Fails if the team has members.
     /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void DeleteServerRpc() {
@@ -188,23 +198,56 @@ public class Team : NetworkBehaviour, ITeam {
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void SyncBoughtItemsServerRpc(int[] boughtItems, int newTeamCredits, int numItemsInShip) {
-        Log.Debug($"{RawName}: Syncing bought items to clients. New credits: {newTeamCredits}, items in ship: {numItemsInShip}");
+    void BuyItemsServerRpc(int[] boughtItems, int newCredits, int numItemsInShip) {
+        #if DEBUG
+        Log.Debug($"{RawName}: Syncing bought items to clients. New credits: {newCredits}, items in ship: {numItemsInShip}");
+        #endif
         
+        Credits = newCredits;
         TerminalUtil.Instance.orderedItemsFromTerminal.AddRange(boughtItems);
-        Credits = newTeamCredits;
         SyncItemsInShipClientRpc(numItemsInShip);
     }
     
     [ClientRpc]
     void SyncItemsInShipClientRpc(int itemsInShip) {
+        #if DEBUG
         Log.Debug($"Received items in ship from server: {itemsInShip}");
+        #endif
+        
         TerminalUtil.Instance.numberOfItemsInDropship = itemsInShip;
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    void BuyShipUnlockableServerRpc(int id, int newCredits) {
+        Credits = newCredits;
+        StartOfRound.Instance.UnlockShipObject(id);
+        StartOfRound.Instance.BuyShipUnlockableClientRpc(newCredits, id);
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    void ChangeLevelServerRpc(int levelId, int newCredits) {
+        Credits = newCredits;
+        StartOfRound.Instance.travellingToNewLevel = true;
+        StartOfRound.Instance.ChangeLevelClientRpc(levelId, 0);
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    void BuyVehicleServerRpc(int vehicleID, int newCredits, bool useWarranty) {
+        Credits = newCredits;
+        
+        var terminal = TerminalUtil.Instance;
+        
+        terminal.hasWarrantyTicket = !useWarranty;
+        terminal.vehicleInDropship = true;
+        terminal.orderedVehicleFromTerminal = vehicleID;
+        terminal.BuyVehicleClientRpc(0, terminal.hasWarrantyTicket);
+    }
+
     internal static void Patch() {
-        // instead of using the normal SyncBoughtItemsServerRpc, which sets the groupCredits for
-        // all clients, we use our own method that only does it for the local team
+        // These patches are to make each team have their own credits.
+        // This is done by preventing the game from setting Terminal.groupCredits
+        // and replacing ServerRpcs on StartOfRound and Terminal with the team-specific RPCs above
+        
         IL.Terminal.SyncBoughtItemsWithServer += il => {
             var c = new ILCursor(il);
 
@@ -218,7 +261,7 @@ public class Team : NetworkBehaviour, ITeam {
                 var team = Player.Local.Team;
                 if (team == null) return;
                 
-                team.SyncBoughtItemsServerRpc(boughtItems, newGroupCredits, numItemsInShip);
+                team.BuyItemsServerRpc(boughtItems, newGroupCredits, numItemsInShip);
             });
         };
         
@@ -231,6 +274,175 @@ public class Team : NetworkBehaviour, ITeam {
             team.SyncItemsInShipClientRpc(itemsInShip);
             
             // don't call orig here to prevent the RPC from being sent to all clients
+        };
+
+        IL.Terminal.LoadNewNodeIfAffordable += il => {
+            var c = new ILCursor(il);
+
+            /*
+             * line 719
+             * objectOfType1.ChangeLevelServerRpc(node.buyRerouteToMoon, this.groupCredits);
+             */
+            c.GotoNext(
+                x => x.MatchCallvirt<StartOfRound>(nameof(StartOfRound.ChangeLevelServerRpc))
+            );
+
+            c.Remove();
+            
+            c.EmitDelegate<Action<StartOfRound, int, int>>((_, levelId, credits) => {
+                var team = Player.Local.Team;
+                if (team == null) return;
+                
+                team.ChangeLevelServerRpc(levelId, credits);
+            });
+            
+            /*
+             * line 724
+             * objectOfType1.BuyShipUnlockableServerRpc(node.shipUnlockableID, this.groupCredits);
+             */
+            c.GotoNext(
+                x => x.MatchCallvirt<StartOfRound>(nameof(StartOfRound.BuyShipUnlockableServerRpc))
+            );
+
+            c.Remove();
+            
+            c.EmitDelegate<Action<StartOfRound, int, int>>((_, id, credits) => {
+                var team = Player.Local.Team;
+                if (team == null) return;
+                
+                team.BuyShipUnlockableServerRpc(id, credits);
+            });
+            
+            /*
+            // [738 15 - 738 82]
+            c.GotoNext(
+                x => x.MatchLdarg(0),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<Terminal>(nameof(Terminal.groupCredits)),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<Terminal>(nameof(Terminal.hasWarrantyTicket)),
+                x => x.MatchCall<Terminal>(nameof(Terminal.BuyVehicleServerRpc))
+            );
+
+            // this
+            c.Emit(OpCodes.Ldarg_0);
+            c.EmitDelegate<Action<Terminal>>(self => {
+                var localTeam = Player.Local.Team;
+                if (localTeam == null) return;
+
+                localTeam.Credits = self.groupCredits;
+            });
+            */
+        };
+
+        On.Terminal.SyncBoughtVehicleWithServer += (_, self, vehicleID) => {
+            var localTeam = Player.Local.Team;
+            if (self.IsServer || localTeam == null) {
+                return;
+            }
+
+            self.useCreditsCooldown = true;
+            localTeam.BuyVehicleServerRpc(vehicleID, self.groupCredits, self.hasWarrantyTicket);
+            
+            // don't call orig
+        };
+        
+        // remove assignments to Terminal.groupCredits
+        
+        IL.StartOfRound.OnPlayerConnectedClientRpc += il => {
+            var c = new ILCursor(il);
+
+            /*
+             * Terminal objectOfType1 = UnityEngine.Object.FindObjectOfType<Terminal>();
+             * objectOfType1.groupCredits = serverMoneyAmount;
+             */
+            c.GotoNext(
+                x => x.MatchCall<Object>(nameof(FindObjectOfType)),
+                x => x.MatchDup()
+            );
+
+            // don't remove the first line
+            c.GotoNext();
+            c.RemoveRange(3);
+        };
+
+        IL.StartOfRound.ChangeLevelClientRpc += il => {
+            var c = new ILCursor(il);
+            
+            // [3498 5 - 3498 23]
+            c.GotoNext(
+                x => x.MatchLdarg(0),
+                x => x.MatchCall<NetworkBehaviour>("get_IsServer"),
+                x => x.MatchBrfalse(out _),
+                x => x.MatchRet()
+            );
+            
+            c.RemoveRange(7);
+        };
+
+        IL.StartOfRound.BuyShipUnlockableClientRpc += il => {
+            var c = new ILCursor(il);
+            
+            c.GotoNext(
+                x => x.MatchCall<Object>(nameof(FindObjectOfType)),
+                x => x.MatchLdarg(1),
+                x => x.MatchStfld<Terminal>(nameof(Terminal.groupCredits))
+            );
+            
+            c.RemoveRange(3);
+            
+            // there's a label targetting the removed line, so we need to reposition it
+            var label = c.MarkLabel();
+            
+            c.GotoPrev(
+                x => x.MatchBeq(out _)
+            );
+
+            c.Remove();
+            c.Emit(OpCodes.Beq_S, label);
+        };
+
+        IL.Terminal.BuyVehicleClientRpc += il => {
+            var c = new ILCursor(il);
+
+            c.GotoNext(
+                x => x.MatchLdarg(0),
+                x => x.MatchLdarg(1),
+                x => x.MatchStfld<Terminal>(nameof(Terminal.groupCredits))
+            );
+
+            c.RemoveRange(3);
+        };
+
+        IL.Terminal.SyncTerminalValuesClientRpc += il => {
+            var c = new ILCursor(il);
+
+            c.GotoNext(
+                x => x.MatchLdarg(0),
+                x => x.MatchLdarg(1),
+                x => x.MatchStfld<Terminal>(nameof(Terminal.groupCredits))
+            );
+
+            c.RemoveRange(3);
+        };
+
+        IL.TimeOfDay.SyncNewProfitQuotaClientRpc += il => {
+            var c = new ILCursor(il);
+            
+            c.GotoNext(
+                x => x.MatchLdloc(0),
+                x => x.MatchLdloc(0),
+                x => x.MatchLdfld<Terminal>(nameof(Terminal.groupCredits)),
+                x => x.MatchLdarg(2),
+                x => x.MatchAdd(),
+                x => x.MatchLdloc(0),
+                x => x.MatchLdfld<Terminal>(nameof(Terminal.groupCredits)),
+                x => x.MatchLdcI4(100_000_000),
+                x => x.MatchCall(typeof(Mathf), nameof(Mathf.Clamp)),
+                x => x.MatchStfld<Terminal>(nameof(Terminal.groupCredits))
+            );
+            
+            c.RemoveRange(10);
         };
     }
 }

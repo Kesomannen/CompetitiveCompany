@@ -23,7 +23,7 @@ internal class RoundReport : MonoBehaviour {
 
     const float Scale = 0.4f;
 
-    void OnEnable() {
+    void Start() {
         foreach (var tab in _tabs) {
             tab.Button.OnClicked += OnTabButtonClicked;
         }
@@ -35,7 +35,7 @@ internal class RoundReport : MonoBehaviour {
         }
     }
     
-    void OnDisable() {
+    void OnDestroy() {
         foreach (var tab in _tabs) {
             tab.Button.OnClicked -= OnTabButtonClicked;
         }
@@ -46,7 +46,9 @@ internal class RoundReport : MonoBehaviour {
     }
 
     void OnRoundEnded() {
-        GetVanillaElement().gameObject.SetActive(false);
+        if (!Application.isEditor) {
+            GetVanillaElement().gameObject.SetActive(false);
+        }
         
         _roundResultsPage.Populate();
         _standingsPage.Populate();
