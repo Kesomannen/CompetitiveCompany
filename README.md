@@ -30,7 +30,7 @@ This mod is intentionally designed to be somewhat minimal. To improve your exper
 Teams are managed through custom terminal commands:
 
 | Command                  | Description                                                                                                                                                   |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `join [player] <team>`   | Join a team. The host can join other players by specifying their username as the second argument.                                                             |
 | `list-teams`             | Lists all teams and their scores.                                                                                                                             |
 | `create-team <name>`     | Creates a new team with the given name. By default, only the host can use this.                                                                               |
