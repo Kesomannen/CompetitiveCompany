@@ -39,7 +39,10 @@ public class Config(ConfigFile file) {
         "General",
         "NumberOfRounds",
         3,
-        "Number of rounds to play before the game ends."
+        new ConfigDescription(
+            "Number of rounds to play before the game ends.",
+            new AcceptableValueRange<int>(1, 50)
+        )
     );
 
     public ConfigEntry<float> ShipSafeRadius { get; } = file.Bind(
@@ -53,45 +56,33 @@ public class Config(ConfigFile file) {
     
 
     /// <summary>
-    /// Who can use the `join` command. The host can always join other players.
+    /// Who can use the 'join' command.
     /// </summary>
     public ConfigEntry<Permission> JoinTeamPerm { get; } = file.Bind(
         "Permissions",
         "JoinTeam",
         Permission.Everyone,
-        "Who can use the `join` command. The host can always join other players."
+        "Who can use the 'join' command."
     );
-
+    
     /// <summary>
-    /// Who can create and delete teams.
-    /// </summary>
-    public ConfigEntry<Permission> CreateAndDeleteTeamPerm { get; } = file.Bind(
-        "Permissions",
-        "CreateAndDeleteTeam",
-        Permission.HostOnly,
-        "Who can create and delete teams."
-    );
-
-    /// <summary>
-    /// Who can edit team names and colors.
+    /// Who can use the 'set-team-color' and 'set-team-name' commands.
     /// </summary>
     public ConfigEntry<Permission> EditTeamPerm { get; } = file.Bind(
         "Permissions",
         "EditTeam",
         Permission.Everyone,
-        "Who can edit team names and colors."
+        "Who can use the 'set-team-color' and 'set-team-name' commands."
     );
 
-
     /// <summary>
-    /// The intensity of the light that is used when spectating.
-    /// Client-sided.
+    /// Who can use the 'create-team' and 'delete-team' commands.
     /// </summary>
-    public ConfigEntry<float> SpectatorLightIntensity { get; } = file.Bind(
-        "Client",
-        "SpectatorLightIntensity",
-        0.5f,
-        ""
+    public ConfigEntry<Permission> CreateAndDeleteTeamPerm { get; } = file.Bind(
+        "Permissions",
+        "CreateAndDeleteTeam",
+        Permission.HostOnly,
+        "Who can use the 'create-team' and 'delete-team' commands."
     );
 }
 

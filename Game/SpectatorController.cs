@@ -38,6 +38,11 @@ public class SpectatorController : MonoBehaviour {
     float _decelTime = -1;
     bool _altitudeLock;
 
+    public static void Spawn() {
+        var obj = new GameObject("SpectatorController", typeof(Camera), typeof(SpectatorController), typeof(AudioListener));
+        DontDestroyOnLoad(obj);
+    }
+    
     /**
      * On awake, make and grab the light
      */
@@ -69,7 +74,7 @@ public class SpectatorController : MonoBehaviour {
             lightObj.transform.eulerAngles = dir;
             light.type = LightType.Directional;
             light.shadows = LightShadows.None;
-            light.intensity = Plugin.Config.SpectatorLightIntensity.Value;
+            //light.intensity = Plugin.Config.SpectatorLightIntensity.Value;
             lightObj.hideFlags = HideFlags.DontSave;
             //lightData.affectsVolumetric = false;
             _lights[i] = light;
@@ -86,8 +91,8 @@ public class SpectatorController : MonoBehaviour {
      * Enables the spectator camera
      */
     public void EnableCam() {
-        if (enabled) return;
-        enabled = true;
+        if (gameObject.activeSelf) return;
+        gameObject.SetActive(true);
 
         //Move the camera
         transform.parent = null;
@@ -143,9 +148,8 @@ public class SpectatorController : MonoBehaviour {
      * Disables the spectator camera
      */
     public void DisableCam() {
-        if (!enabled) return;
-
-        enabled = false;
+        if (!gameObject.activeSelf) return;
+        gameObject.SetActive(false);
 
         foreach (var light in _lights) {
             light.enabled = false;
@@ -277,6 +281,7 @@ public class SpectatorController : MonoBehaviour {
      * When destroyed, need to manually destroy the ghost light
      */
     void OnDestroy() {
+        Log.Warning("SpectatorController destroyed!");
         foreach (var light in _lights) {
             if (light != null) {
                 Destroy(light.gameObject);

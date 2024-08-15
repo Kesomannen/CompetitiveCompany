@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using GameNetcodeStuff;
-using HarmonyLib;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -110,8 +106,7 @@ public class Session : NetworkBehaviour {
     public static event Action<Session>? OnSessionStarted;
 
     /// <summary>
-    /// Invoked when a session ends, which either happens when the last round has ended,
-    /// or the user leaves the game.
+    /// Invoked when a session ends, which happens when the user leaves the lobby.
     /// </summary>
     public static event Action? OnSessionEnded;
 
@@ -126,9 +121,14 @@ public class Session : NetworkBehaviour {
     }
 
     IEnumerator Start() {
+        // do this after suits are loaded in
+        if (Settings.ForceSuits) {
+            RefreshSuits();
+        }
+        
+        yield return null;
+        
         if (IsServer) {
-            yield return null;
-
             // OnClientConnected isn't called for the host
             OnPlayerJoined(StartOfRound.Instance.localPlayerController);
         }
@@ -141,8 +141,12 @@ public class Session : NetworkBehaviour {
             SyncSettings();
             ListenToConfigChanges();
 
-            CreateTeamServerRpc("Hoarding bugs", new Color(0.99f, 0.55f, 0.11f));
+            CreateTeamServerRpc("Loot bugs", new Color(0.99f, 0.55f, 0.11f));
             CreateTeamServerRpc("Manticoils", new Color(0.20f, 0.57f, 0.16f));
+        }
+
+        if (IsClient) {
+            _settings.OnValueChanged += OnSettingsChanged;
         }
 
         OnSessionStarted?.Invoke(this);
@@ -153,10 +157,17 @@ public class Session : NetworkBehaviour {
             UnlistenToConfigChanges();
         }
         
+        if (IsClient) {
+            _settings.OnValueChanged -= OnSettingsChanged;
+        }
+        
         Log.Message("Session stopped");
         OnSessionEnded?.Invoke();
     }
 
+    /// <summary>
+    /// Creates a team with the given name and color.
+    /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void CreateTeamServerRpc(FixedString128Bytes teamName, Color color) {
         var team = Instantiate(NetworkPrefabs.Team);
@@ -174,36 +185,42 @@ public class Session : NetworkBehaviour {
 
         player.SetTeamFromServer(Teams.GetSmallest());
     }
-
+    
     void StartRound() {
         if (IsRoundActive) return;
-
-        if (!IsMatchActive) {
-            // this means it's the first round
-            OnMatchStarted?.Invoke();
-        }
-
-        IsRoundActive = true;
-        OnRoundStarted?.Invoke();
-        Log.Info($"Round {RoundNumber + 1} started");
-
-        if (!IsServer) return;
-
+        
         RoundNumber++;
-            
         foreach (var team in Teams) {
             team.RoundScore = 0;
         }
+        
+        StartRoundClientRpc();
     }
 
+    [ClientRpc]
+    void StartRoundClientRpc() {
+        IsRoundActive = true;
+
+        if (!IsMatchActive) {
+            OnMatchStarted?.Invoke();
+        }
+        
+        OnRoundStarted?.Invoke();
+        Log.Info($"Round {RoundNumber + 1} started");
+    }
+    
     void EndRound() {
         if (!IsRoundActive) return;
+        EndRoundClientRpc();
+    }
 
+    [ClientRpc]
+    void EndRoundClientRpc() {
         Log.Info($"Round {RoundNumber} ended");
         IsRoundActive = false;
         OnRoundEnded?.Invoke();
         
-        // the first round is round 0
+        // round starts with 0
         if (RoundNumber >= Settings.NumberOfRounds - 1) {
             EndMatch();
         }
@@ -222,26 +239,56 @@ public class Session : NetworkBehaviour {
         RoundNumber = -1;
     }
 
-    void ListenToConfigChanges() {
-        var c = Plugin.Config;
-        c.FriendlyFire.SettingChanged += OnSyncedEntryChanged;
-        c.ShipSafeRadius.SettingChanged += OnSyncedEntryChanged;
-        c.NumberOfRounds.SettingChanged += OnSyncedEntryChanged;
+    void OnSettingsChanged(NetworkedSettings prev, NetworkedSettings current) {
+        if (prev.ForceSuits != current.ForceSuits) {
+            RefreshSuits();
+        }
+        
+        TimeOfDay.Instance.UpdateProfitQuotaCurrentTime();
+    }
 
-        c.JoinTeamPerm.SettingChanged += OnSyncedEntryChanged;
-        c.CreateAndDeleteTeamPerm.SettingChanged += OnSyncedEntryChanged;
-        c.EditTeamPerm.SettingChanged += OnSyncedEntryChanged;
+    public void RefreshSuits() {
+        var suits = FindObjectsOfType<UnlockableSuit>(includeInactive: true);
+        if (Settings.ForceSuits) {
+            Log.Debug("Hiding suit rack and forcing suits on players");
+            foreach (var unlockableSuit in suits) {
+                unlockableSuit.gameObject.SetActive(false);
+            }
+
+            foreach (var player in Players) {
+                player.WearTeamSuit();
+            }
+        } else {
+            Log.Debug("Showing suit rack and positioning suits");
+            foreach (var suit in suits) {
+                suit.gameObject.SetActive(true);
+            }
+            StartOfRound.Instance.PositionSuitsOnRack();
+        }
+    }
+
+    void ListenToConfigChanges() {
+        var _ = Plugin.Config;
+        _.ForceSuits.SettingChanged += OnSyncedEntryChanged;
+        _.FriendlyFire.SettingChanged += OnSyncedEntryChanged;
+        _.ShipSafeRadius.SettingChanged += OnSyncedEntryChanged;
+        _.NumberOfRounds.SettingChanged += OnSyncedEntryChanged;
+
+        _.JoinTeamPerm.SettingChanged += OnSyncedEntryChanged;
+        _.CreateAndDeleteTeamPerm.SettingChanged += OnSyncedEntryChanged;
+        _.EditTeamPerm.SettingChanged += OnSyncedEntryChanged;
     }
 
     void UnlistenToConfigChanges() {
-        var c = Plugin.Config;
-        c.FriendlyFire.SettingChanged -= OnSyncedEntryChanged;
-        c.ShipSafeRadius.SettingChanged -= OnSyncedEntryChanged;
-        c.NumberOfRounds.SettingChanged -= OnSyncedEntryChanged;
+        var _ = Plugin.Config;
+        _.ForceSuits.SettingChanged -= OnSyncedEntryChanged;
+        _.FriendlyFire.SettingChanged -= OnSyncedEntryChanged;
+        _.ShipSafeRadius.SettingChanged -= OnSyncedEntryChanged;
+        _.NumberOfRounds.SettingChanged -= OnSyncedEntryChanged;
         
-        c.JoinTeamPerm.SettingChanged -= OnSyncedEntryChanged;
-        c.CreateAndDeleteTeamPerm.SettingChanged -= OnSyncedEntryChanged;
-        c.EditTeamPerm.SettingChanged -= OnSyncedEntryChanged;
+        _.JoinTeamPerm.SettingChanged -= OnSyncedEntryChanged;
+        _.CreateAndDeleteTeamPerm.SettingChanged -= OnSyncedEntryChanged;
+        _.EditTeamPerm.SettingChanged -= OnSyncedEntryChanged;
     }
 
     void OnSyncedEntryChanged(object? sender, EventArgs e) {
@@ -282,25 +329,23 @@ public class Session : NetworkBehaviour {
             return Vector3.Distance(player.transform.position, point);
         }
     }
-
-    static TerminalNode? _refuseCompanyMoonNode;
-
+    
     internal static void Patch() {
         On.StartOfRound.Awake += (orig, self) => {
+            orig(self);
+            
             if (NetworkManager.Singleton.IsServer) {
                 var session = Instantiate(NetworkPrefabs.Session);
                 session.GetComponent<NetworkObject>().Spawn();
             }
-
-            orig(self);
         };
 
         On.StartOfRound.OnDestroy += (orig, self) => {
-            orig(self);
-
             if (NetworkManager.Singleton.IsServer) {
                 Current.NetworkObject.Despawn(destroy: true);
             }
+            
+            orig(self);
         };
 
         On.StartOfRound.OnClientConnect += (orig, self, clientId) => {
@@ -312,13 +357,17 @@ public class Session : NetworkBehaviour {
         };
 
         On.StartOfRound.StartGame += (orig, self) => {
-            Current.StartRound();
+            if (self.IsServer) {
+                Current.StartRound();
+            }
             orig(self);
         };
 
         On.StartOfRound.EndOfGameClientRpc += (orig, self, bodiesInsured, daysPlayersSurvived, connectedPlayersOnServer, scrapCollectedOnServer) => {
+            if (self.IsServer) {
+                Current.EndRound();
+            }
             orig(self, bodiesInsured, daysPlayersSurvived, connectedPlayersOnServer, scrapCollectedOnServer);
-            Current.EndRound();
         };
 
         // add pvp check
@@ -328,65 +377,16 @@ public class Session : NetworkBehaviour {
 
             var result = Current.Combat.CanDamage(attacker, victim);
             
+            #if DEBUG
             var resultStr = result.Result ? "Allowed" : $"Denied: {result.Reason}";
             Log.Debug($"{attacker} tried to damage {victim}: {resultStr}");
-
+            #endif
+            
             if (result.Result) {
                 orig(self, amount, direction, playerWhoHit);
             } else {
-                HUDManager.Instance.DisplayTip("Not allowed to damage player!", result.Reason, isWarning: true);
+                HUDManager.Instance.DisplayTip("PvP is not allowed!", result.Reason, isWarning: true);
             }
-        };
-        
-        _refuseCompanyMoonNode = ScriptableObject.CreateInstance<TerminalNode>();
-        _refuseCompanyMoonNode.displayText = "Company moon is disabled by CompetitiveCompany.";
-        _refuseCompanyMoonNode.clearPreviousText = true;
-
-        // prevent going to the company moon
-        IL.Terminal.LoadNewNodeIfAffordable += il => {
-            var c = new ILCursor(il);
-            
-            /*
-             * [719 13 - 719 89]
-             * this.useCreditsCooldown = true;
-             * objectOfType1.ChangeLevelServerRpc(node.buyRerouteToMoon, this.groupCredits);
-            */
-            c.GotoNext(
-                x => x.MatchLdloc(0),
-                x => x.MatchLdarg(1),
-                x => x.MatchLdfld<TerminalNode>(nameof(TerminalNode.buyRerouteToMoon)),
-                x => x.MatchLdarg(0),
-                x => x.MatchLdfld<Terminal>(nameof(Terminal.groupCredits)),
-                x => x.MatchCallvirt<StartOfRound>(nameof(StartOfRound.ChangeLevelServerRpc))
-            );
-
-            var target = c.Next;
-            
-            /*
-             * if (node.buyRerouteToMoon == 3) {
-             *     this.LoadNewNode(Session._refuseCompanyMoonNode);
-             *     return;
-             * }
-             */
-            
-            // node
-            c.Emit(OpCodes.Ldarg_1);
-            // buyRerouteToMoon
-            c.Emit(OpCodes.Ldfld, AccessTools.Field(typeof(TerminalNode), nameof(TerminalNode.buyRerouteToMoon)));
-            // 3 -- id of company moon
-            c.Emit(OpCodes.Ldc_I4_3);
-            // if (node.buyRerouteToMoon != 3) goto next
-            c.Emit(OpCodes.Bne_Un_S, target);
-            
-            // this
-            c.Emit(OpCodes.Ldarg_0);
-            // Session._refuseCompanyMoonNode
-            c.Emit(OpCodes.Ldsfld, AccessTools.Field(typeof(Session), nameof(_refuseCompanyMoonNode)));
-            // LoadNewNode
-            c.Emit(OpCodes.Call, AccessTools.Method(typeof(Terminal), nameof(Terminal.LoadNewNode)));
-            
-            // return
-            c.Emit(OpCodes.Ret);
         };
     }
 }

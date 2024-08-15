@@ -13,6 +13,7 @@ namespace CompetitiveCompany.Game;
 /// </summary>
 public class Teams : IReadOnlyList<Team> {
     readonly List<Team> _list = [];
+    readonly Dictionary<int, Team> _suits = new();
     
     public int Count => _list.Count;
     
@@ -145,8 +146,19 @@ public class Teams : IReadOnlyList<Team> {
         }
     }
     
-    internal void Register(Team team) => _list.Add(team);
-    internal void Unregister(Team team) => _list.Remove(team);
+    public bool TryGetFromSuit(int suitId, [NotNullWhen(true)] out Team? team) {
+        return _suits.TryGetValue(suitId, out team);
+    }
+
+    internal void Register(Team team) {
+        _list.Add(team);
+        _suits[team.SuitId] = team;
+    }
+
+    internal void Unregister(Team team) {
+        _list.Remove(team);
+        _suits.Remove(team.SuitId);
+    }
     
     public Team this[int index] => _list[index];
     

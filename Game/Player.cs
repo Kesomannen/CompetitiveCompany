@@ -4,6 +4,7 @@ using CompetitiveCompany.Util;
 using GameNetcodeStuff;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using LogLevel = BepInEx.Logging.LogLevel;
@@ -135,23 +136,37 @@ public class Player : NetworkBehaviour {
         team.OnNameChanged += OnTeamNameChanged;
         OnTeamNameChanged(team.Name);
         
-        Controller.currentSuitID = team.SuitId;
-        
-        Controller.thisPlayerModel.material = team.SuitMaterial;
-        Controller.thisPlayerModelLOD1.material = team.SuitMaterial;
-        Controller.thisPlayerModelLOD2.material = team.SuitMaterial;
-        Controller.thisPlayerModelArms.material = team.SuitMaterial;
-        
         Team = team;
         team.MembersInternal.Add(this);
+
+        var forceSuits = _session.Settings.ForceSuits;
+        if (forceSuits || _session.Teams.TryGetFromSuit(Controller.currentSuitID, out _)) {
+            // don't do this if the player is wearing a non-team suit
+            WearTeamSuit();
+        }
 
         if (IsOwner) {
             // only do this for the local player
             team.OnCreditsChanged += OnTeamCreditsChanged;
             OnTeamCreditsChanged(team.Credits);
+            
+            if (!forceSuits) {
+                _session.RefreshSuits();
+            }
         }
         
         PlayerLog($"Joined team {team.Name}", LogLevel.Debug);
+    }
+
+    public void WearTeamSuit() {
+        if (Team == null) return;
+        
+        Controller.currentSuitID = Team.SuitId;
+        
+        Controller.thisPlayerModel.material = Team.SuitMaterial;
+        Controller.thisPlayerModelLOD1.material = Team.SuitMaterial;
+        Controller.thisPlayerModelLOD2.material = Team.SuitMaterial;
+        Controller.thisPlayerModelArms.material = Team.SuitMaterial;
     }
 
     void LeaveTeam(Team team) {
@@ -171,13 +186,14 @@ public class Player : NetworkBehaviour {
         Controller.usernameBillboardText.color = color;
     }
     
-    void OnTeamNameChanged(string current) {
-        Controller.usernameBillboardText.text = $"({current}) {Controller.playerUsername}";
+    void OnTeamNameChanged(in FixedString128Bytes newValue) {
+        Controller.usernameBillboardText.text = $"({newValue}) {Controller.playerUsername}";
     }
 
     static void OnTeamCreditsChanged(int credits) {
         Log.Debug($"Credits changed: {credits}");
         TerminalUtil.Instance.groupCredits = credits;
+        TimeOfDay.Instance.UpdateProfitQuotaCurrentTime();
     }
     
     void SetItemInElevator(GrabbableObject item, bool inShip) {
@@ -235,7 +251,7 @@ public class Player : NetworkBehaviour {
 
     public void StartSpectating() {
         if (!IsOwner) {
-            PlayerLog("StartSpectating must be called on the local player", LogLevel.Error);
+            PlayerLog("StartSpectating can only be called on the local player", LogLevel.Error);
             return;
         }
         
@@ -243,12 +259,15 @@ public class Player : NetworkBehaviour {
         _isSpectating.Value = true;
         
         ClearTeamServerRpc();
+        
+        Controller.gameObject.SetActive(false);
+        Controller.isPlayerControlled = false;
         SpectatorController.Instance.EnableCam();
     }
 
     public void StopSpectating() {
         if (!IsOwner) {
-            PlayerLog("StopSpectating must be called on the local player", LogLevel.Error);
+            PlayerLog("StopSpectating can only be called on the local player", LogLevel.Error);
             return;
         }
         
@@ -256,6 +275,9 @@ public class Player : NetworkBehaviour {
         _isSpectating.Value = false;
         
         SetTeamServerRpc(_session.Teams.GetSmallest());
+        
+        Controller.gameObject.SetActive(true);
+        Controller.isPlayerControlled = true;
         SpectatorController.Instance.DisableCam();
     }
 

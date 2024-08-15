@@ -18,7 +18,10 @@ internal class TeamRoundResult : MonoBehaviour {
         
         _nameText.color = team.Color;
         _nameText.text = team.Name;
+
+        _scoreText.enabled = score > 0;
         
+        // maximize contrast between text and background
         var colorBrightness = team.Color.r + team.Color.g + team.Color.b;
         _scoreText.color = colorBrightness > 1.5f ? Color.black : Color.white;
         _scoreText.text = "$" + score;

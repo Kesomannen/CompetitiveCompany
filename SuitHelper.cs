@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace CompetitiveCompany;
+﻿namespace CompetitiveCompany;
 
 public static class SuitHelper {
     public static UnlockableItem GetOriginalSuit(StartOfRound playerManager) {

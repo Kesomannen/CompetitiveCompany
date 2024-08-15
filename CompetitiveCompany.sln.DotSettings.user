@@ -3,4 +3,5 @@
   &lt;Assembly Path="D:\git\CompetitiveCompany\CompetitiveCompany\lib\LethalAPI.Terminal.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\git\CompetitiveCompany\CompetitiveCompany\lib\FlowTween.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\git\CompetitiveCompany\CompetitiveCompany\obj\Debug\netstandard2.1\publicized\Assembly-CSharp.dll" /&gt;&#xD;
+  &lt;Assembly Path="D:\git\CompetitiveCompany\CompetitiveCompany\lib\LethalConfig.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>

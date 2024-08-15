@@ -33,6 +33,7 @@
         <Reference Include="LethalAPI.Terminal" HintPath="..\lib\LethalAPI.Terminal.dll" />
         <Reference Include="LethalCompanyInputUtils" HintPath="..\lib\LethalCompanyInputUtils.dll" />
         <Reference Include="FlowTween" HintPath="..\lib\FlowTween.dll" />
+        <Reference Include="LethalConfig" HintPath="..\lib\LethalConfig.dll" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -42,10 +43,5 @@
     <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
         <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
     </Target>
-    
-    <Target Name="CopyDLL" AfterTargets="NetcodePatch"> 
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="..\..\UnityProject\Assets\Mods\" />
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Gale\data\lethal-company\profiles\CC\BepInEx\plugins\Kesomannen-CompetitiveCompany\" />
-    </Target>
-    
+
 </Project>

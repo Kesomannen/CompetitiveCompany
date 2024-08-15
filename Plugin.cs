@@ -1,9 +1,13 @@
-﻿using System.Reflection;
+﻿using System;
+using System.IO;
+using System.Reflection;
 using BepInEx;
+using CompetitiveCompany.Compat;
 using CompetitiveCompany.Game;
 using CompetitiveCompany.UI;
 using HarmonyLib;
 using UnityEngine;
+using static BepInEx.BepInDependency.DependencyFlags;
 
 namespace CompetitiveCompany;
 
@@ -12,6 +16,7 @@ namespace CompetitiveCompany;
     BepInDependency("evaisa.lethallib"),
     BepInDependency("LethalAPI.Terminal"),
     BepInDependency("com.rune580.LethalCompanyInputUtils"),
+    BepInDependency("ainavt.lc.lethalconfig", SoftDependency)
 ]
 [BepInPlugin(Guid, Name, Version)]
 public class Plugin : BaseUnityPlugin {
@@ -32,6 +37,7 @@ public class Plugin : BaseUnityPlugin {
         Player.Patch();
         Session.Patch();
         RoundReport.Patch();
+        MiscPatches.Patch();
         Team.Patch();
         
         Log.Debug("Running InitializeOnLoad methods...");
@@ -46,6 +52,22 @@ public class Plugin : BaseUnityPlugin {
         Log.Debug("Loading assets...");
         Assets.Load();
         
+        Log.Debug("Checking for soft dependencies and compatibility patches...");
+        CompatHelper.CheckFor("ainavt.lc.lethalconfig", LethalConfigCompat.Initialize);
+
+        /*
+        Session.OnSessionStarted += _ => {
+            SpectatorController.Spawn();
+        };
+        
+        Session.OnSessionEnded += () => {
+            var spectatorController = SpectatorController.Instance;
+            if (spectatorController != null) {
+                Destroy(spectatorController.gameObject);
+            }
+        };
+        */
+        
         Log.Info("Plugin loaded!");
     }
 
@@ -54,13 +76,17 @@ public class Plugin : BaseUnityPlugin {
         
         var types = Assembly.GetExecutingAssembly().GetTypes();
         foreach (var type in types) {
-            var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            try {
+                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
             
-            foreach (var method in methods) {
-                var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
-                if (attributes.Length > 0) {
-                    method.Invoke(null, null);
+                foreach (var method in methods) {
+                    var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
+                    if (attributes.Length > 0) {
+                        method.Invoke(null, null);
+                    }
                 }
+            } catch (FileNotFoundException) {
+                // thrown if a soft dependency is missing, ignore
             }
         }
     }

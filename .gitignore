@@ -1,6 +1,7 @@
 bin/
 obj/
-lib/
+lib/*
+!lib/FlowTween.dll
 /packages/
 riderModule.iml
 /_ReSharper.Caches/

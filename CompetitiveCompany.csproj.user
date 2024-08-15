@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <Target Name="CopyDLL" AfterTargets="NetcodePatch">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="..\..\UnityProject\Assets\Mods\" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Gale\data\lethal-company\profiles\CC\BepInEx\plugins\Kesomannen-CompetitiveCompany\" />
+    </Target>
+    
+    
+</Project>

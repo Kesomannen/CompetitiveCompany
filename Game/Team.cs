@@ -87,7 +87,7 @@ public class Team : NetworkBehaviour, ITeam {
     /// The unlockables ID of the team's suit.
     /// </summary>
     public int SuitId { get; private set; }
-    
+
     /// <summary>
     /// The unlockable item of the team's suit.
     /// </summary>
@@ -114,21 +114,30 @@ public class Team : NetworkBehaviour, ITeam {
     static readonly int _normalMapID = Shader.PropertyToID("_NormalMap");
 
     public event Action<Color>? OnColorChanged;
-    public event Action<string>? OnNameChanged; 
+    public event NameChangedHandler? OnNameChanged; 
     public event Action<int>? OnCreditsChanged; 
     
-    void Start() {
-        Suit = SuitHelper.CreateSuit("CompetitiveCompanySuit", StartOfRound.Instance);
+    public delegate void NameChangedHandler(in FixedString128Bytes name);
+
+    void CreateSuit() {
+        var startOfRound = StartOfRound.Instance;
+        Suit = SuitHelper.CreateSuit("Team Suit", startOfRound);
+        Suit.alreadyUnlocked = true;
 
         SuitMaterial = Instantiate(Assets.TeamSuitMaterial);
+        
+        // copy the original textures
         SuitMaterial.mainTexture = Suit.suitMaterial.mainTexture;
         SuitMaterial.SetTexture(_normalMapID, Suit.suitMaterial.GetTexture(_normalMapID));
-        Suit.suitMaterial = SuitMaterial;
-        OnColorChangedHandler(default, Color);
         
-        var unlockables = StartOfRound.Instance.unlockablesList.unlockables;
+        Suit.suitMaterial = SuitMaterial;
+        
+        var unlockables = startOfRound.unlockablesList.unlockables;
         SuitId = unlockables.Count;
         unlockables.Add(Suit);
+        
+        OnColorChangedHandler(default, Color);
+        OnNameChangedHandler(default, RawName);
     }
     
     /// <summary>
@@ -143,6 +152,8 @@ public class Team : NetworkBehaviour, ITeam {
 
     public override void OnNetworkSpawn() {
         _session = Session.Current;
+
+        CreateSuit();
         _session.Teams.Register(this);
         
         _color.OnValueChanged += OnColorChangedHandler;
@@ -167,7 +178,8 @@ public class Team : NetworkBehaviour, ITeam {
     }
     
     void OnNameChangedHandler(FixedString128Bytes _, FixedString128Bytes current) {
-        OnNameChanged?.Invoke(current.ToString());
+           Suit.unlockableName = $"{current} Suit";
+        OnNameChanged?.Invoke(in current);
     }
     
     void OnCreditsChangedHandler(int previous, int current) {
@@ -266,10 +278,11 @@ public class Team : NetworkBehaviour, ITeam {
         };
         
         // on the server, SyncGroupCreditsClientRpc is called directly from LoadNewAffordableNode
-        On.Terminal.SyncGroupCreditsClientRpc += (_, _, newGroupCredits, itemsInShip) => {
+        On.Terminal.SyncGroupCreditsClientRpc += (_, self, newGroupCredits, itemsInShip) => {
             var team = Player.Local.Team;
             if (team == null) return;
-            
+
+            self.useCreditsCooldown = false;
             team.Credits = newGroupCredits;
             team.SyncItemsInShipClientRpc(itemsInShip);
             

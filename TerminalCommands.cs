@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CompetitiveCompany.Game;
-using CompetitiveCompany.Util;
 using LethalAPI.LibTerminal;
 using LethalAPI.LibTerminal.Attributes;
 using Unity.Netcode;
@@ -21,30 +20,121 @@ internal class TerminalCommands {
         TerminalRegistry.CreateTerminalRegistry().RegisterFrom(new TerminalCommands());
     }
     
-    [TerminalCommand("spectate"), CommandInfo("Spectate the game")]
+    [
+        TerminalCommand("settings", clearText: true),
+        CommandInfo("Show the current game settings.")
+    ]
+    string SettingsCommand() {
+        var settings = Session.Current.Settings;
+
+        return $"Current game settings:\n\n" +
+               $"Friendly fire: {FormatBool(settings.FriendlyFire)}\n" +
+               $"Number of rounds: {settings.NumberOfRounds}\n" +
+               $"Ship safe radius: {settings.ShipSafeRadius}m";
+        
+        string FormatBool(bool value) => value ? "Enabled" : "Disabled";
+    }
+    
+    /*
+    [
+        TerminalCommand("spectate"),
+        CommandInfo("Leave your team and start spectating the game.")
+    ]
     string SpectateCommand() {
         Player.Local.StartSpectating();
         return "You are now spectating.";
     }
+    */
 
     [
         TerminalCommand("join", clearText: true),
-        CommandInfo("Join a team. Host can join other players by specifying their username.", "[player] <team>")
+        CommandInfo("Join a team. Host can join other players by specifying their username after the team name.", "<team> [player]")
     ]
-    string JoinCommand([RemainingText] string teamName) {
+    string JoinCommand([RemainingText] string input) {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
         if (!CheckPerms(settings => settings.JoinTeamPerm)) return NoPermsMessage;
+        
+        return NetworkManager.Singleton.IsServer switch {
+            true => Server(),
+            false => Client()
+        };
 
-        if (!Session.Current.Teams.TryGet(teamName, out var team)) {
-            return $"Team '{teamName}' not found!";
+        string Server() {
+            // both the team name and player name might have spaces in them,
+            // so we check each possible "break point" in between the arguments
+            
+            // example:
+            // input = "team name playerName"
+            
+            // i = 0
+            // teamName = "team", playerName = "name playerName"
+            // -- team could not be found, continue
+            
+            // i = 1
+            // teamName = "team name", playerName = "playerName"
+            // -- team and player found, break
+            
+            var spaceIndicies = input
+                .Select((c, i) => (c, i))
+                .Where(t => t.c == ' ')
+                .Select(t => t.i)
+                .Append(input.Length)
+                .ToArray();
+            
+            string? playerName = null;
+            Player? player = null;
+            Team? team = null;
+            
+            for (var i = 0; i < spaceIndicies.Length; i++) {
+                var teamName = input[..spaceIndicies[i]];
+                
+                if (!Session.Current.Teams.TryGet(teamName, out team)) {
+                    continue;
+                }
+                
+                if (i == spaceIndicies.Length - 1) {
+                    // no player was specified, default to local
+                    player = Player.Local;
+                    break;
+                }
+
+                playerName = input[(spaceIndicies[i] + 1)..];
+                if (Session.Current.Players.TryGetByName(playerName, out player)) {
+                    break;
+                }
+            }
+            
+            if (team == null || player == null) {
+                return playerName != null ?
+                    $"Player '{playerName}' not found!" :
+                    "Invalid team or player name!";
+            }
+            
+            if (player.Team == team) {
+                return player.IsOwner ? 
+                    $"You are already in team {team.Name}!" :
+                    $"Player {playerName} is already in team {team.Name}!";
+            }
+            
+            player.SetTeamFromServer(team);
+            return player.IsOwner ? 
+                $"Joined team {team.Name}." :
+                $"Moved {playerName} to team {team.RawName}";
         }
 
-        if (Player.Local.Team?.Name == teamName) {
-            return $"You are already in team {teamName}!";
-        }
+        string Client() {
+            if (!Session.Current.Teams.TryGet(input, out var team)) {
+                return $"Team '{input}' not found!";
+            }
 
-        Player.Local.SetTeamServerRpc(team);
-        return $"Joined team {team.Name}.";
+            var player = Player.Local;
+            if (player.Team == team) {
+                return $"You are already in team {team.Name}!";
+            }
+            
+            player.SetTeamServerRpc(team);
+            return $"Joined team {team.RawName}.";
+        }
     }
 
     [
@@ -106,7 +196,7 @@ internal class TerminalCommands {
 
     [
         TerminalCommand("set-team-color", clearText: true),
-        CommandInfo("Set the color of your current team, in hex format", "<color>")
+        CommandInfo("Set the color of your current team", "<color>")
     ]
     string ColorCommand([RemainingText] string input) {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
@@ -120,11 +210,12 @@ internal class TerminalCommands {
 
         var color = ParseColor(input);
         if (color == null) {
-            return $"Invalid color! Please use hex format (e.g. #FF0000) or one of the following: {string.Join(", ", _colorNames)}.";
+            return $"Invalid color! Please use hex format (e.g. #FF0000) or one of the following: {string.Join(", ", _colorNames.Keys)}.";
         }
 
         team.SetColorServerRpc(color.Value);
-        return $"Set color of team {team.Name} to <color={ColorUtility.ToHtmlStringRGB(color.Value)}>{input}</color>.";
+        var hex = input.StartsWith("#") ? input : "#" + ColorUtility.ToHtmlStringRGB(color.Value);
+        return $"Set color of team {team.Name} to <color={hex}>{input}</color>.";
     }
     
     static readonly Dictionary<string, Color> _colorNames = new() {

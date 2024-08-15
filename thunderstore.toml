@@ -37,4 +37,4 @@ target = "FlowTween.dll"
 
 [publish]
 communities = ["lethal-company"]
-categories = ["serverside", "clientside", "mods"]
+lethal-company.categories = ["serverside", "clientside", "mods"]
