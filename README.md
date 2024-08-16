@@ -1,6 +1,6 @@
 ﻿# Competitive Company
 
-_In an effort to combat the declining performance of its employees, the Company is introducing a form of in-house training. This initiative pits coworkers against each other in a scrap-collecting competition across the galaxy. By the end of a few days, the lucky winner will be awarded a continued contract with the Company **and** a brand new group of coworkers!_
+_In an effort to combat the declining performance of its employees, the Company is introducing a form of in-house training. This new initiative pits coworkers against each other in a scrap-collecting competition across the galaxy. By the end of a few days, the lucky winner will be awarded a continued contract with the Company and a **brand new** group of coworkers!_
 
 _Sign up now to secure your future with the Company!_
 
