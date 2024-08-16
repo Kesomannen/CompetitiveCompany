@@ -10,6 +10,7 @@ namespace CompetitiveCompany;
 /// of <see cref="Config"/> synced from the host to all clients.
 /// </summary>
 public class Config(ConfigFile file) {
+    /// <inheritdoc cref="Keybinds"/>
     public Keybinds Keybinds { get; } = new();
     
     /// <summary>
@@ -86,7 +87,17 @@ public class Config(ConfigFile file) {
     );
 }
 
+/// <summary>
+/// Who can use a certain command.
+/// </summary>
 public enum Permission: byte {
+    /// <summary>
+    /// Clients and server.
+    /// </summary>
     Everyone,
+    
+    /// <summary>
+    /// Only the server.
+    /// </summary>
     HostOnly
 }

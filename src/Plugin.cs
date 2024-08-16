@@ -1,16 +1,20 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using BepInEx;
 using CompetitiveCompany.Compat;
 using CompetitiveCompany.Game;
 using CompetitiveCompany.UI;
+using GameNetcodeStuff;
 using HarmonyLib;
+using RuntimeNetcodeRPCValidator;
 using UnityEngine;
 using static BepInEx.BepInDependency.DependencyFlags;
 
 namespace CompetitiveCompany;
 
+/// <summary>
+/// Main BepInEx plugin class.
+/// </summary>
 [
     BepInDependency("ComponentBundler"),
     BepInDependency("evaisa.lethallib"),
@@ -20,9 +24,13 @@ namespace CompetitiveCompany;
 ]
 [BepInPlugin(Guid, Name, Version)]
 public class Plugin : BaseUnityPlugin {
+    /// <summary>
+    /// The GUID of the plugin. This is guaranteed to be unique and will never change.
+    /// </summary>
     public const string Guid = "com.kesomannen.competitivecompany";
-    public const string Name = "CompetitiveCompany";
-    public const string Version = "0.1.0";
+    
+    const string Name = "CompetitiveCompany";
+    const string Version = "0.1.0";
     
     public new static Config Config { get; private set; } = null!;
 
@@ -54,6 +62,9 @@ public class Plugin : BaseUnityPlugin {
         
         Log.Debug("Checking for soft dependencies and compatibility patches...");
         CompatHelper.CheckFor("ainavt.lc.lethalconfig", LethalConfigCompat.Initialize);
+
+        var validator = new NetcodeValidator(Guid);
+        validator.BindToPreExistingObjectByBehaviour<Player, PlayerControllerB>();
 
         /*
         Session.OnSessionStarted += _ => {

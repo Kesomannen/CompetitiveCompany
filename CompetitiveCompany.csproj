@@ -5,11 +5,13 @@
         <Nullable>enable</Nullable>
         <LangVersion>12.0</LangVersion>
         <AssemblyName>CompetitiveCompany</AssemblyName>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup>
         <DebugSymbols>true</DebugSymbols>
         <DebugType>embedded</DebugType>
+        <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
     </PropertyGroup>
 
     <ItemGroup>
@@ -34,6 +36,7 @@
         <Reference Include="LethalCompanyInputUtils" HintPath="..\lib\LethalCompanyInputUtils.dll" />
         <Reference Include="FlowTween" HintPath="..\lib\FlowTween.dll" />
         <Reference Include="LethalConfig" HintPath="..\lib\LethalConfig.dll" />
+        <Reference Include="NicholaScott.BepInEx.RuntimeNetcodeRPCValidator" HintPath="..\lib\NicholaScott.BepInEx.RuntimeNetcodeRPCValidator.dll" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -41,7 +44,7 @@
     </ItemGroup>
 
     <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
-        <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
+        <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')" />
     </Target>
 
 </Project>

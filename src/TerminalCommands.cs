@@ -105,9 +105,9 @@ internal class TerminalCommands {
             }
             
             if (team == null || player == null) {
-                return playerName != null ?
-                    $"Player '{playerName}' not found!" :
-                    "Invalid team or player name!";
+                return playerName == null ?
+                    "Invalid team or player name!" :
+                    $"Player '{playerName}' not found!";
             }
             
             if (player.Team == team) {

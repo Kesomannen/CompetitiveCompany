@@ -5,10 +5,11 @@ repository = "https://github.com/Kesomannen/CompetitiveCompany"
 name = "CompetitiveCompany"
 namespace = "Kesomannen"
 description = "Adds a new PvP team-based scrap-collecting gamemode to the game"
+version = "0.1.0"
 websiteUrl = "https://github.com/Kesomannen/CompetitiveCompany"
 dependencies = [
     "BepInEx-BepInExPack-5.4.2100",
-    "Kesomannen-ComponentBundler-1.0.1",
+    "Ozone-Runtime_Netcode_Patcher-0.2.5",
     "Evaisa-FixPluginTypesSerialization-1.1.1",
     "LethalAPI-LethalAPI_Terminal-1.0.1",
     "Evaisa-LethalLib-0.16.1",
@@ -28,11 +29,15 @@ source = "LICENSE.md"
 target = "LICENSE.md"
 
 [[build.copy]]
-source = "CompetitiveCompany\\bin\\Release\\netstandard2.1\\CompetitiveCompany.dll"
+source = "bin\\Release\\netstandard2.1\\CompetitiveCompany.dll"
 target = "CompetitiveCompany.dll"
 
 [[build.copy]]
-source = "CompetitiveCompany\\lib\\FlowTween.dll"
+source = "bin\\Release\\netstandard2.1\\CompetitiveCompany.xml"
+target = "CompetitiveCompany.xml"
+
+[[build.copy]]
+source = "lib\\FlowTween.dll"
 target = "FlowTween.dll"
 
 [publish]

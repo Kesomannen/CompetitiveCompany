@@ -14,7 +14,8 @@ namespace CompetitiveCompany.Game;
 public class Teams : IReadOnlyList<Team> {
     readonly List<Team> _list = [];
     readonly Dictionary<int, Team> _suits = new();
-    
+
+    /// <inheritdoc />
     public int Count => _list.Count;
     
     /// <summary>
@@ -60,17 +61,22 @@ public class Teams : IReadOnlyList<Team> {
         return team;
     }
 
+    /// <summary>
+    /// Pretty-prints the teams in table format with the specified <paramref name="width"/>.
+    /// If <paramref name="color"/> is true, the team names will be colored using TextMeshPro's rich text tags.
+    /// </summary>
+    /// <example>
+    /// <code lang="plaintext">
+    /// * ============================================ *
+    /// | Team      | Round Score    | Total Score     |
+    /// * -------------------------------------------- *
+    /// | Team 1    | 100            | 1000            |
+    /// | Team 2    | 200            | 2000            |
+    /// | Team 3    | 300            | 3000            |
+    /// * ============================================ *
+    /// </code>
+    /// </example>
     public IEnumerable<string> PrettyPrint(int width, bool color) {
-        /*
-         * * ============================================ *
-         * | Team      | Round Score    | Total Score     |
-         * * --------- * -------------- * --------------- *
-         * | Team 1    | 100            | 1000            |
-         * | Team 2    | 200            | 2000            |
-         * | Team 3    | 300            | 3000            |
-         * * ========= * ============== * =============== *
-         */
-
         var teamNames = _list.Select(team => {
             var length = team.RawName.Length;
             var name = color ? team.ColoredName : team.Name;
@@ -146,6 +152,9 @@ public class Teams : IReadOnlyList<Team> {
         }
     }
     
+    /// <summary>
+    /// Tries to get a team by its suit ID. Returns true if the team was found, false otherwise.
+    /// </summary>
     public bool TryGetFromSuit(int suitId, [NotNullWhen(true)] out Team? team) {
         return _suits.TryGetValue(suitId, out team);
     }
@@ -159,9 +168,11 @@ public class Teams : IReadOnlyList<Team> {
         _list.Remove(team);
         _suits.Remove(team.SuitId);
     }
-    
+
+    /// <inheritdoc />
     public Team this[int index] => _list[index];
-    
+
+    /// <inheritdoc />
     public IEnumerator<Team> GetEnumerator() => _list.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

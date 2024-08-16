@@ -54,6 +54,9 @@ public class Player : NetworkBehaviour {
     /// </summary>
     public Team? Team { get; private set; }
 
+    /// <summary>
+    /// Whether the player is spectating.
+    /// </summary>
     public bool IsSpectating => _isSpectating.Value;
     
     /// <summary>
@@ -96,6 +99,7 @@ public class Player : NetworkBehaviour {
         Controller = GetComponent<PlayerControllerB>();
     }
 
+    /// <inheritdoc />
     public override void OnNetworkSpawn() {
         _session = Session.Current;
         _session.Players.Register(this);
@@ -107,6 +111,7 @@ public class Player : NetworkBehaviour {
         }
     }
 
+    /// <inheritdoc />
     public override void OnNetworkDespawn() {
         _session.Players.Unregister(this);
         
@@ -158,6 +163,10 @@ public class Player : NetworkBehaviour {
         PlayerLog($"Joined team {team.Name}", LogLevel.Debug);
     }
 
+    /// <summary>
+    /// Sets the player's suit to the team's suit.
+    /// Doesn't do anything if the player isn't in a team.
+    /// </summary>
     public void WearTeamSuit() {
         if (Team == null) return;
         
@@ -249,6 +258,9 @@ public class Player : NetworkBehaviour {
         Log.Source.Log(level, $"{DebugName}: {message}");
     }
 
+    /// <summary>
+    /// Starts spectating the game. Can only be called on the local player.
+    /// </summary>
     public void StartSpectating() {
         if (!IsOwner) {
             PlayerLog("StartSpectating can only be called on the local player", LogLevel.Error);
@@ -265,6 +277,9 @@ public class Player : NetworkBehaviour {
         SpectatorController.Instance.EnableCam();
     }
 
+    /// <summary>
+    /// Stops spectating the game. Can only be called on the local player.
+    /// </summary>
     public void StopSpectating() {
         if (!IsOwner) {
             PlayerLog("StopSpectating can only be called on the local player", LogLevel.Error);
@@ -281,9 +296,8 @@ public class Player : NetworkBehaviour {
         SpectatorController.Instance.DisableCam();
     }
 
-    public override string ToString() {
-        return DebugName;
-    }
+    /// <inheritdoc />
+    public override string ToString() => DebugName;
 
     internal static void Patch() {
         On.GameNetcodeStuff.PlayerControllerB.SetItemInElevator += (orig, self, inShip, inElevator, item) => {

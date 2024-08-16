@@ -11,7 +11,6 @@ namespace CompetitiveCompany.Game;
 /// <summary>
 /// The main class which manages the teams, players and flow of a match.
 /// You can use <c>Session.Current</c> to access the current session.
-/// <br/><br/>
 /// Session lives as long as <c>StartOfRound</c>, from the user joining a lobby to them leaving it.
 /// During a session, there may be any number of matches, each with a number of rounds.
 /// </summary>
@@ -53,7 +52,6 @@ public class Session : NetworkBehaviour {
     /// List of all teams in the session. <see cref="Teams"/> implements <see cref="IReadOnlyList{Team}"/>,
     /// so you can use it like any other list, except it's immutable.
     /// </summary>
-    /// <seealso cref="Team"/>
     public Teams Teams { get; } = new();
 
     /// <summary>

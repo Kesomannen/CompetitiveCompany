@@ -4,11 +4,9 @@ namespace CompetitiveCompany.Game;
 
 /// <summary>
 /// Controls PvP combat with a list of predicates.
-/// <br/><br/>
 /// The main method is <see cref="CanDamage"/>, which checks <see cref="Predicates"/> in order,
 /// returning the first <see cref="DamagePredicateResult"/> that denies the damage,
 /// or <see cref="DamagePredicateResult.Allow"/> if none do.
-/// <br/><br/>
 /// The most used instance of this class is the one stored in <see cref="Session.Combat"/>,
 /// which is evaluated each time a player tries to damage another player.
 /// </summary>
@@ -26,7 +24,7 @@ public class Combat {
     /// or <see cref="DamagePredicateResult.Deny"/> to deny it with a reason.
     /// </summary>
     /// <example>
-    /// <code lang="c#">
+    /// <code>
     /// // predicate to only allow pvp inside the facility
     /// var predicate = (attacker, victim) => {
     ///     if (!attacker.Controller.isInsideFactory) {
@@ -88,6 +86,9 @@ public class Combat {
     }
 }
 
+/// <summary>
+/// The result of a <see cref="Combat.DamagePredicate"/>.
+/// </summary>
 public readonly struct DamagePredicateResult {
     /// <summary>
     /// Whether the damage attempt was allowed or denied.

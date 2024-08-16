@@ -1,9 +1,13 @@
 ﻿using LethalCompanyInputUtils.Api;
 using LethalCompanyInputUtils.BindingPathEnums;
 using UnityEngine.InputSystem;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace CompetitiveCompany;
 
+/// <summary>
+/// Customizable keybinds for the mod, using LethalCompanyInputUtils.
+/// </summary>
 public class Keybinds : LcInputActions {
     # nullable disable
     

@@ -11,10 +11,28 @@ using Object = UnityEngine.Object;
 
 namespace CompetitiveCompany.Game;
 
+/// <summary>
+/// Interface for <see cref="Team"/>, currently only used for UI mocking.
+/// </summary>
 public interface ITeam {
+    /// <summary>
+    /// The name of the team.
+    /// </summary>
     string Name { get; }
+    
+    /// <summary>
+    /// The color of the team.
+    /// </summary>
     Color Color { get; }
+    
+    /// <summary>
+    /// The scrap value collected by the team in the current round.
+    /// </summary>
     int RoundScore { get; }
+    
+    /// <summary>
+    /// The total scrap value collected by the team in the current match.
+    /// </summary>
     int TotalScore { get; }
 }
 
@@ -34,10 +52,14 @@ public class Team : NetworkBehaviour, ITeam {
     /// <summary>
     /// The name of the team. To set this, use <see cref="RawName"/>.
     /// </summary>
+    /// <remarks>
+    /// This creates a new string from <see cref="RawName"/> each time it's accessed,
+    /// so only use this if you specifically need a <c>string</c>.
+    /// </remarks>
     public string Name => _name.Value.ToString();
 
     /// <summary>
-    /// The raw name of the team. Can only be set on the server.
+    /// The name of the team. Can only be set on the server.
     /// </summary>
     public FixedString128Bytes RawName {
         get => _name.Value;
@@ -113,10 +135,25 @@ public class Team : NetworkBehaviour, ITeam {
     
     static readonly int _normalMapID = Shader.PropertyToID("_NormalMap");
 
+    /// <summary>
+    /// Invoked when the team's color changes.
+    /// </summary>
     public event Action<Color>? OnColorChanged;
-    public event NameChangedHandler? OnNameChanged; 
+    
+    /// <summary>
+    /// Invoked when the team's name changes.
+    /// The value is passed by reference to avoid copying the buffer with each invocation.
+    /// </summary>
+    public event NameChangedHandler? OnNameChanged;
+    
+    /// <summary>
+    /// Invoked when the team's credits change.
+    /// </summary>
     public event Action<int>? OnCreditsChanged; 
     
+    /// <summary>
+    /// Handler for the <see cref="OnNameChanged"/> event.
+    /// </summary>
     public delegate void NameChangedHandler(in FixedString128Bytes name);
 
     void CreateSuit() {
@@ -150,6 +187,7 @@ public class Team : NetworkBehaviour, ITeam {
         Credits += score;
     }
 
+    /// <inheritdoc />
     public override void OnNetworkSpawn() {
         _session = Session.Current;
 
@@ -160,7 +198,8 @@ public class Team : NetworkBehaviour, ITeam {
         _name.OnValueChanged += OnNameChangedHandler;
         _credits.OnValueChanged += OnCreditsChangedHandler;
     }
-    
+
+    /// <inheritdoc />
     public override void OnNetworkDespawn() {
         _session.Teams.Unregister(this);
         
@@ -199,11 +238,17 @@ public class Team : NetworkBehaviour, ITeam {
         NetworkObject.Despawn(destroy: true);
     }
     
+    /// <summary>
+    /// Sets <see cref="Color"/> from any client.
+    /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void SetColorServerRpc(Color color) {
         Color = color;
     }
-    
+
+    /// <summary>
+    /// Sets <see cref="RawName"/> from any client.
+    /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void SetNameServerRpc(FixedString128Bytes newName) {
         RawName = newName;
