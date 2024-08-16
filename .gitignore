@@ -1,6 +1,7 @@
 bin/
 obj/
 lib/*
+*.user
 !lib/FlowTween.dll
 /packages/
 riderModule.iml

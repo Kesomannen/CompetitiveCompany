@@ -2,9 +2,9 @@
 repository = "https://github.com/Kesomannen/CompetitiveCompany"
 
 [package]
-name = "CompetitiveCompany2"
+name = "CompetitiveCompany"
 namespace = "Kesomannen"
-description = "Introduces a new PvP scrap-collecting gamemode to the game"
+description = "Adds a new PvP team-based scrap-collecting gamemode to the game"
 websiteUrl = "https://github.com/Kesomannen/CompetitiveCompany"
 dependencies = [
     "BepInEx-BepInExPack-5.4.2100",

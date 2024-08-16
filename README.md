@@ -1,4 +1,4 @@
-﻿# Competitive Company 2
+﻿# Competitive Company
 
 _In an effort to combat the declining performance of its employees, the Company is introducing a form of in-house training. This initiative pits coworkers against each other in a scrap-collecting competition across the galaxy. By the end of a few days, the lucky winner will be awarded a continued contract with the Company **and** a brand new group of coworkers!_
 
@@ -6,7 +6,7 @@ _Sign up now to secure your future with the Company!_
 
 ---
 
-This mod is a rewrite and continuation of [Competitive Company](https://thunderstore.io/c/lethal-company/p/agmas/CompetitiveCompany/) by agmas.
+This mod is a rewrite and continuation of [Competitive Company by agmas](https://thunderstore.io/c/lethal-company/p/agmas/CompetitiveCompany/).
 It features a new game mode, where teams of players compete to collect the most amount of scrap within a set number of days. Credits are automatically added as you collect scrap and there's no quota to worry about.
 
 > [!IMPORTANT]
