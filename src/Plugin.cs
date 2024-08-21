@@ -16,11 +16,12 @@ namespace CompetitiveCompany;
 /// Main BepInEx plugin class.
 /// </summary>
 [
-    BepInDependency("ComponentBundler"),
     BepInDependency("evaisa.lethallib"),
     BepInDependency("LethalAPI.Terminal"),
     BepInDependency("com.rune580.LethalCompanyInputUtils"),
-    BepInDependency("ainavt.lc.lethalconfig", SoftDependency)
+    BepInDependency("NicholaScott.BepInEx.RuntimeNetcodeRPCValidator"),
+    BepInDependency("ainavt.lc.lethalconfig", SoftDependency),
+    BepInDependency("BetterEmotes", SoftDependency)
 ]
 [BepInPlugin(Guid, Name, Version)]
 public class Plugin : BaseUnityPlugin {
@@ -32,6 +33,9 @@ public class Plugin : BaseUnityPlugin {
     const string Name = "CompetitiveCompany";
     const string Version = "0.1.0";
     
+    /// <summary>
+    /// Main instance of <see cref="CompetitiveCompany.Config"/>.
+    /// </summary>
     public new static Config Config { get; private set; } = null!;
 
     void Awake() {
@@ -43,10 +47,11 @@ public class Plugin : BaseUnityPlugin {
         harmony.PatchAll(typeof(ChatPatches));
 
         Player.Patch();
-        Session.Patch();
+        MatchEndScreen.Patch();
         RoundReport.Patch();
         MiscPatches.Patch();
         Team.Patch();
+        Session.Patch();
         
         Log.Debug("Running InitializeOnLoad methods...");
         RunInitializeOnLoadMethods();
@@ -61,8 +66,11 @@ public class Plugin : BaseUnityPlugin {
         Assets.Load();
         
         Log.Debug("Checking for soft dependencies and compatibility patches...");
-        CompatHelper.CheckFor("ainavt.lc.lethalconfig", LethalConfigCompat.Initialize);
-
+        SoftDependencyHelper.CheckFor("LethalConfig", "ainavt.lc.lethalconfig", LethalConfigCompat.Initialize);
+        // we don't need to do anything in particular for BetterEmotes here,
+        // but this will put a log message if it's present
+        SoftDependencyHelper.CheckFor("BetterEmotes", "BetterEmotes", () => { }); 
+        
         var validator = new NetcodeValidator(Guid);
         validator.BindToPreExistingObjectByBehaviour<Player, PlayerControllerB>();
 

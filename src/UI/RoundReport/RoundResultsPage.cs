@@ -11,6 +11,6 @@ internal class RoundResultsPage : MonoBehaviour {
         _teamResultsPage.Reset();
         
         IReadOnlyList<ITeam> teams = Application.isEditor ? MockTeam.Teams : Session.Current.Teams;
-        _teamResultsPage.Populate(teams, team => team.RoundScore, true);
+        _teamResultsPage.Populate(teams, TeamMetric.RoundScore, true);
     }
 }

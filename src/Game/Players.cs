@@ -52,5 +52,5 @@ public class Players : IReadOnlyList<Player> {
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     
     internal void Register(Player player) => _players.Add(player);
-    internal void Unregister(Player player) => _players.Remove(player);
+    internal void Deregister(Player player) => _players.Remove(player);
 }

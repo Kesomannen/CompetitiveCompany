@@ -1,21 +1,20 @@
-[general]
-repository = "https://github.com/Kesomannen/CompetitiveCompany"
+﻿[general]
+repository = "https://thunderstore.io"
 
 [package]
 name = "CompetitiveCompany"
 namespace = "Kesomannen"
-description = "Adds a new PvP team-based scrap-collecting gamemode to the game"
-version = "0.1.0"
+description = "Adds a new team-based PvP scrap-collecting gamemode to the game"
 websiteUrl = "https://github.com/Kesomannen/CompetitiveCompany"
-dependencies = [
-    "BepInEx-BepInExPack-5.4.2100",
-    "Ozone-Runtime_Netcode_Patcher-0.2.5",
-    "Evaisa-FixPluginTypesSerialization-1.1.1",
-    "LethalAPI-LethalAPI_Terminal-1.0.1",
-    "Evaisa-LethalLib-0.16.1",
-    "Rune580-LethalCompany_InputUtils-0.7.7",
-    "Evaisa-HookGenPatcher-0.0.5"
-]
+
+[package.dependencies]
+BepInEx-BepInExPack = "5.4.2100"
+Ozone-Runtime_Netcode_Patcher = "0.2.5"
+Evaisa-FixPluginTypesSerialization = "1.1.1"
+LethalAPI-LethalAPI_Terminal = "1.0.1"
+Rune580-LethalCompany_InputUtils = "0.7.7"
+Evaisa-LethalLib = "0.16.1"
+Evaisa-HookGenPatcher = "0.0.5"
 
 [build]
 icon = "icon.png"
@@ -29,17 +28,23 @@ source = "LICENSE.md"
 target = "LICENSE.md"
 
 [[build.copy]]
-source = "bin\\Release\\netstandard2.1\\CompetitiveCompany.dll"
-target = "CompetitiveCompany.dll"
+source = "bin/Release/netstandard2.1/CompetitiveCompany.dll"
+target = "plugins/CompetitiveCompany.dll"
 
 [[build.copy]]
-source = "bin\\Release\\netstandard2.1\\CompetitiveCompany.xml"
-target = "CompetitiveCompany.xml"
+source = "bin/Release/netstandard2.1/CompetitiveCompany.xml"
+target = "plugins/CompetitiveCompany.xml"
 
 [[build.copy]]
-source = "lib\\FlowTween.dll"
-target = "FlowTween.dll"
+source = "lib/FlowTween.dll"
+target = "plugins/FlowTween.dll"
+
+[[build.copy]]
+source = "bundles/competitive-company"
+target = "plugins/competitive-company"
 
 [publish]
 communities = ["lethal-company"]
-lethal-company.categories = ["serverside", "clientside", "mods"]
+
+[publish.categories]
+lethal-company = ["serverside", "clientside", "mods"]

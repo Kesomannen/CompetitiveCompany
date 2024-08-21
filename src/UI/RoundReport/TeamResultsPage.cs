@@ -12,13 +12,13 @@ internal class TeamResultsPage : MonoBehaviour {
     
     readonly List<TeamRoundResult> _teamUIs = [];
 
-    public void Populate(IEnumerable<ITeam> teams, Func<ITeam, int> getScore, bool showWinner) {
-        var orderedTeams = teams.OrderByDescending(getScore).ToArray();
-        var maxScore = getScore(orderedTeams[0]);
+    public void Populate(IEnumerable<ITeam> teams, TeamMetric metric, bool showWinner) {
+        var orderedTeams = teams.OrderByDescending(team => team.GetScore(metric)).ToArray();
+        var maxScore = orderedTeams[0].GetScore(metric);
         
         foreach (var team in orderedTeams) {
             var teamUI = Instantiate(_teamPrefab, _teamContainer);
-            var score = getScore(team);
+            var score = team.GetScore(metric);
             teamUI.Initialize(team, score, maxScore, showWinner && score == maxScore);
             _teamUIs.Add(teamUI);
         }

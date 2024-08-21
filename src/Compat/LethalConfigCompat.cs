@@ -31,7 +31,10 @@ internal static class LethalConfigCompat {
             Generate(config.ShipSafeRadius),
             Generate(config.JoinTeamPerm),
             Generate(config.EditTeamPerm),
-            Generate(config.CreateAndDeleteTeamPerm)
+            Generate(config.CreateAndDeleteTeamPerm),
+            Generate(config.ShowEndOfMatchCutscene),
+            Generate(config.ShowMouseOnRoundReport),
+            Generate(config.EndOfMatchEmote),
         };
         
         foreach (var baseConfigItem in items) {

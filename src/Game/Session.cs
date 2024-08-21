@@ -79,24 +79,24 @@ public class Session : NetworkBehaviour {
     /// Invoked right after a round has started, which happens when all
     /// players have loaded in a new moon.
     /// </summary>
-    public event Action? OnRoundStarted;
+    public event Action<RoundStartedContext>? OnRoundStarted;
 
     /// <summary>
     /// Invoked right after a round has ended, which happens when
     /// a moon has been unloaded (and the performance report pops up).
     /// </summary>
-    public event Action? OnRoundEnded;
+    public event Action<RoundEndedContext>? OnRoundEnded;
 
     /// <summary>
     /// Invoked when a match starts, before the first <see cref="OnRoundEnded"/> is called.
     /// This happens when the host pulls the lever after a previous match has ended (or at the start of the game).
     /// </summary>
-    public event Action? OnMatchStarted;
+    public event Action<MatchStartedContext>? OnMatchStarted;
     
     /// <summary>
     /// Invoked when a match ends, which happens right after the last round has ended.
     /// </summary>
-    public event Action? OnMatchEnded;
+    public event Action<MatchEndedContext>? OnMatchEnded;
     
     /// <summary>
     /// Invoked when a session starts, which happens in Awake as soon as the user joins a game.
@@ -132,6 +132,7 @@ public class Session : NetworkBehaviour {
         }
     }
 
+    /// <inheritdoc />
     public override void OnNetworkSpawn() {
         Log.Message("Session started");
 
@@ -150,6 +151,7 @@ public class Session : NetworkBehaviour {
         OnSessionStarted?.Invoke(this);
     }
 
+    /// <inheritdoc />
     public override void OnNetworkDespawn() {
         if (IsServer) {
             UnlistenToConfigChanges();
@@ -200,10 +202,10 @@ public class Session : NetworkBehaviour {
         IsRoundActive = true;
 
         if (!IsMatchActive) {
-            OnMatchStarted?.Invoke();
+            OnMatchStarted?.Invoke(new MatchStartedContext());
         }
         
-        OnRoundStarted?.Invoke();
+        OnRoundStarted?.Invoke(new RoundStartedContext(RoundNumber));
         Log.Info($"Round {RoundNumber + 1} started");
     }
     
@@ -216,22 +218,26 @@ public class Session : NetworkBehaviour {
     void EndRoundClientRpc() {
         Log.Info($"Round {RoundNumber} ended");
         IsRoundActive = false;
-        OnRoundEnded?.Invoke();
+        
+        var wasLastRound = RoundNumber >= Settings.NumberOfRounds - 1;
+        OnRoundEnded?.Invoke(new RoundEndedContext(wasLastRound, RoundNumber));
         
         // round starts with 0
-        if (RoundNumber >= Settings.NumberOfRounds - 1) {
+        if (wasLastRound) {
             EndMatch();
         }
     }
 
     void EndMatch() {
-        Log.Debug("Match ended");
-        OnMatchEnded?.Invoke();
+        Log.Info("Match ended");
+        OnMatchEnded?.Invoke(new MatchEndedContext(Teams.GetLeader(TeamMetric.TotalScore)));
 
         if (!IsServer) return;
         
         foreach (var team in Teams) {
+            team.RoundScore = 0;
             team.TotalScore = 0;
+            team.Credits = 0;
         }
         
         RoundNumber = -1;
@@ -245,10 +251,9 @@ public class Session : NetworkBehaviour {
         TimeOfDay.Instance.UpdateProfitQuotaCurrentTime();
     }
 
-    public void RefreshSuits() {
+    internal void RefreshSuits() {
         var suits = FindObjectsOfType<UnlockableSuit>(includeInactive: true);
         if (Settings.ForceSuits) {
-            Log.Debug("Hiding suit rack and forcing suits on players");
             foreach (var unlockableSuit in suits) {
                 unlockableSuit.gameObject.SetActive(false);
             }
@@ -257,7 +262,6 @@ public class Session : NetworkBehaviour {
                 player.WearTeamSuit();
             }
         } else {
-            Log.Debug("Showing suit rack and positioning suits");
             foreach (var suit in suits) {
                 suit.gameObject.SetActive(true);
             }
@@ -386,5 +390,35 @@ public class Session : NetworkBehaviour {
                 HUDManager.Instance.DisplayTip("PvP is not allowed!", result.Reason, isWarning: true);
             }
         };
+    }
+}
+
+public readonly struct RoundStartedContext {
+    public readonly int RoundNumber;
+
+    internal RoundStartedContext(int roundNumber) {
+        RoundNumber = roundNumber;
+    }
+}
+
+public readonly struct RoundEndedContext {
+    public readonly bool WasLastRound;
+    public readonly int RoundNumber;
+    
+    internal RoundEndedContext(bool wasLastRound, int roundNumber) {
+        WasLastRound = wasLastRound;
+        RoundNumber = roundNumber;
+    }
+}
+
+public readonly struct MatchStartedContext {
+    
+}
+
+public readonly  struct MatchEndedContext {
+    public readonly Team WinningTeam;
+    
+    internal MatchEndedContext(Team winningTeam) {
+        WinningTeam = winningTeam;
     }
 }

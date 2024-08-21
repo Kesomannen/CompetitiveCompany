@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using BepInEx.Bootstrap;
 using CompetitiveCompany.Util;
 using GameNetcodeStuff;
 using Mono.Cecil.Cil;
@@ -41,6 +43,7 @@ public class Player : NetworkBehaviour {
     }
     
     readonly NetworkVariable<bool> _isSpectating = new(writePerm: NetworkVariableWritePermission.Owner);
+    readonly NetworkVariable<Emote> _endOfMatchEmote = new(writePerm: NetworkVariableWritePermission.Owner);
 
     /// <summary>
     /// The vanilla controller of the player.
@@ -60,6 +63,13 @@ public class Player : NetworkBehaviour {
     public bool IsSpectating => _isSpectating.Value;
     
     /// <summary>
+    /// The <see cref="Emote"/> to play at the end of the match, 
+    /// picked by the player's owner. Note that still may return an emote that doesn't
+    /// exist if BetterEmotes is not installed. <see cref="EndOfMatchEmoteChecked"/> accounts for this.
+    /// </summary>
+    public Emote EndOfMatchEmote => _endOfMatchEmote.Value;
+    
+    /// <summary>
     /// Whether the player is controlled by the host/server of the game.
     /// </summary>
     public bool OwnedByHost => OwnerClientId == NetworkManager.ServerClientId;
@@ -70,7 +80,7 @@ public class Player : NetworkBehaviour {
     /// The name of the player, including useful debug information.
     /// </summary>
     /// <example>
-    /// <c>Kesomannen [Hoarding bugs] (Host + Local)</c>
+    /// <c>Kesomannen [Loot bugs] (Host + Local)</c>
     /// </example>
     public string DebugName {
         get {
@@ -81,6 +91,21 @@ public class Player : NetworkBehaviour {
             }
 
             return $"{Controller.playerUsername} [{team}] ({title})";
+        }
+    }
+    
+    /// <summary>
+    /// The <see cref="Emote"/> to play at the end of the match, picked by the player's owner.
+    /// This checks if BetterEmotes is loaded to make sure the emote is valid.
+    /// If the player has picked an invalid emote, this falls back to <see cref="Emote.Dance"/>.
+    /// </summary>
+    public Emote EndOfMatchEmoteChecked {
+        get {
+            if (!Chainloader.PluginInfos.ContainsKey("BetterEmotes") && (int)EndOfMatchEmote > 2) {
+                return Emote.Dance;
+            }
+            
+            return EndOfMatchEmote;
         }
     }
 
@@ -100,6 +125,28 @@ public class Player : NetworkBehaviour {
     }
 
     /// <inheritdoc />
+    public override void OnGainedOwnership() {
+        base.OnGainedOwnership();
+        
+        StartCoroutine(Routine());
+        return;
+
+        IEnumerator Routine() {
+            yield return null;
+            var setting = Plugin.Config.EndOfMatchEmote;
+            _endOfMatchEmote.Value = setting.Value;
+            setting.SettingChanged += OnEndOfMatchEmoteChanged;
+        }
+    }
+
+    /// <inheritdoc />
+    public override void OnLostOwnership() {
+        base.OnLostOwnership();
+        
+        Plugin.Config.EndOfMatchEmote.SettingChanged -= OnEndOfMatchEmoteChanged;
+    }
+
+    /// <inheritdoc />
     public override void OnNetworkSpawn() {
         _session = Session.Current;
         _session.Players.Register(this);
@@ -113,7 +160,7 @@ public class Player : NetworkBehaviour {
 
     /// <inheritdoc />
     public override void OnNetworkDespawn() {
-        _session.Players.Unregister(this);
+        _session.Players.Deregister(this);
         
         _teamReference.OnValueChanged -= OnTeamReferenceChanged;
 
@@ -256,6 +303,10 @@ public class Player : NetworkBehaviour {
 
     void PlayerLog(string message, LogLevel level) {
         Log.Source.Log(level, $"{DebugName}: {message}");
+    }
+    
+    void OnEndOfMatchEmoteChanged(object sender, EventArgs e) {
+        _endOfMatchEmote.Value = Plugin.Config.EndOfMatchEmote.Value;
     }
 
     /// <summary>

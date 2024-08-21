@@ -29,7 +29,7 @@ internal class RoundReport : MonoBehaviour {
         }
         
         if (Application.isEditor) {
-            OnRoundEnded();
+            OnRoundEnded(default);
         } else {
             Session.Current.OnRoundEnded += OnRoundEnded;
         }
@@ -45,7 +45,9 @@ internal class RoundReport : MonoBehaviour {
         }
     }
 
-    void OnRoundEnded() {
+    void OnRoundEnded(RoundEndedContext ctx) {
+        if (ctx.WasLastRound) return;
+        
         if (!Application.isEditor) {
             GetVanillaElement().gameObject.SetActive(false);
         }
@@ -58,10 +60,12 @@ internal class RoundReport : MonoBehaviour {
         
         _autoScrollCoroutine = StartCoroutine(AutoScroll());
         _waitThenHideCoroutine = StartCoroutine(WaitThenHide());
-        
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        Player.Local.Controller.quickMenuManager.isMenuOpen = true;
+
+        if (Plugin.Config.ShowMouseOnRoundReport.Value) {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            Player.Local.Controller.quickMenuManager.isMenuOpen = true;
+        }
         
         _panel.SetActive(true);
         return;
@@ -73,9 +77,11 @@ internal class RoundReport : MonoBehaviour {
     }
 
     public void Hide() {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        Player.Local.Controller.quickMenuManager.isMenuOpen = false;
+        if (Plugin.Config.ShowMouseOnRoundReport.Value) {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            Player.Local.Controller.quickMenuManager.isMenuOpen = false;
+        }
 
         _panel.DisableObject();
         

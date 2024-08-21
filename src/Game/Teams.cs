@@ -158,6 +158,13 @@ public class Teams : IReadOnlyList<Team> {
     public bool TryGetFromSuit(int suitId, [NotNullWhen(true)] out Team? team) {
         return _suits.TryGetValue(suitId, out team);
     }
+    
+    /// <summary>
+    /// Gets the team with the highest score in the specified <paramref name="metric"/>.
+    /// </summary>
+    public Team GetLeader(TeamMetric metric) {
+        return _list.OrderByDescending(team => team.GetScore(metric)).First();
+    }
 
     internal void Register(Team team) {
         _list.Add(team);
@@ -175,4 +182,5 @@ public class Teams : IReadOnlyList<Team> {
     /// <inheritdoc />
     public IEnumerator<Team> GetEnumerator() => _list.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
 }

@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>12.0</LangVersion>
         <AssemblyName>CompetitiveCompany</AssemblyName>
+        <ProjectGuid>com.kesomannen.competitivecompany</ProjectGuid>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -18,24 +19,18 @@
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
         <PackageReference Include="BepInEx.Core" Version="5.*" />
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" />
+        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="61.0.0-ngd.0" />
         <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" />
     </ItemGroup>
     
     <ItemGroup>
-        <Reference Include="Assembly-CSharp" HintPath="..\lib\Assembly-CSharp.dll" Publicize="true" PrivateAssets="all" />
         <Reference Include="MMHOOK_Assembly-CSharp" HintPath="..\lib\MMHOOK_Assembly-CSharp.dll" />
-        <Reference Include="UnityEngine.UI" HintPath="..\lib\UnityEngine.UI.dll" />
-        <Reference Include="Unity.Netcode.Runtime" HintPath="..\lib\Unity.Netcode.Runtime.dll" />
-        <Reference Include="Unity.Netcode.Components" HintPath="..\lib\Unity.Netcode.Components.dll" />
-        <Reference Include="Unity.TextMeshPro" HintPath="..\lib\Unity.TextMeshPro.dll" />
-        <Reference Include="Unity.InputSystem" HintPath="..\lib\Unity.InputSystem.dll" />
-        <Reference Include="Unity.Collections" HintPath="..\lib\Unity.Collections.dll" />
-        <Reference Include="Unity.RenderPipelines.HighDefinition" HintPath="..\lib\Unity.RenderPipelines.HighDefinition.dll" />
         <Reference Include="LethalLib" HintPath="..\lib\LethalLib.dll" />
         <Reference Include="LethalAPI.Terminal" HintPath="..\lib\LethalAPI.Terminal.dll" />
         <Reference Include="LethalCompanyInputUtils" HintPath="..\lib\LethalCompanyInputUtils.dll" />
         <Reference Include="FlowTween" HintPath="..\lib\FlowTween.dll" />
         <Reference Include="LethalConfig" HintPath="..\lib\LethalConfig.dll" />
+        <Reference Include="BetterEmotes" HintPath="..\lib\BetterEmotes.dll" />
         <Reference Include="NicholaScott.BepInEx.RuntimeNetcodeRPCValidator" HintPath="..\lib\NicholaScott.BepInEx.RuntimeNetcodeRPCValidator.dll" />
     </ItemGroup>
 

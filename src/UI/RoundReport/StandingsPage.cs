@@ -21,6 +21,6 @@ internal class StandingsPage : MonoBehaviour {
             teams = Session.Current.Teams;
         }
 
-        _teamResultsPage.Populate(teams, team => team.TotalScore, isLastRound);
+        _teamResultsPage.Populate(teams, TeamMetric.TotalScore, isLastRound);
     }
 }

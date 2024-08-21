@@ -36,6 +36,21 @@ public interface ITeam {
     int TotalScore { get; }
 }
 
+public enum TeamMetric {
+    RoundScore,
+    TotalScore
+}
+
+public static class TeamExtensions {
+    public static int GetScore(this ITeam team, TeamMetric metric) {
+        return metric switch {
+            TeamMetric.RoundScore => team.RoundScore,
+            TeamMetric.TotalScore => team.TotalScore,
+            _ => throw new ArgumentOutOfRangeException(nameof(metric), metric, null)
+        };
+    }
+}
+
 /// <summary>
 /// Manages a team in the game. You can get hold of a team by <c>Session.Current.Teams</c> or <c>Player.Team</c>. 
 /// </summary>
