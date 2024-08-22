@@ -1,12 +1,12 @@
 ﻿namespace CompetitiveCompany.Util;
 
-// we can't directly use the Emote enum from BetterEmotes to keep it a soft dependency
+// We want BetterEmotes to be a soft dependency, so we can't use their Emote enum directly
 
 /// <summary>
 /// Ids of emotes, including the ones from BetterEmots.
 /// </summary>
 public enum Emote {
-    // disable missingxml comment warnings
+    // disable missing xml comment warnings
     #pragma warning disable 1591
     
     Dance = 1,
@@ -20,4 +20,10 @@ public enum Emote {
     Prisyadka = 9
     
     #pragma warning restore 1591
+}
+
+public static class EmoteExtensions {
+    public static bool IsVanilla(this Emote emote) {
+        return (int) emote == 1 || (int) emote == 2;
+    }
 }

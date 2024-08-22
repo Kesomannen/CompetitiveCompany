@@ -74,6 +74,8 @@ public class Player : NetworkBehaviour {
     /// </summary>
     public bool OwnedByHost => OwnerClientId == NetworkManager.ServerClientId;
 
+    public bool IsControlled => Controller.isPlayerControlled;
+
     Session _session = null!;
     
     /// <summary>
@@ -101,7 +103,7 @@ public class Player : NetworkBehaviour {
     /// </summary>
     public Emote EndOfMatchEmoteChecked {
         get {
-            if (!Chainloader.PluginInfos.ContainsKey("BetterEmotes") && (int)EndOfMatchEmote > 2) {
+            if (!Chainloader.PluginInfos.ContainsKey("BetterEmotes") && !EndOfMatchEmote.IsVanilla()) {
                 return Emote.Dance;
             }
             
