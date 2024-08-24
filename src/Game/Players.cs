@@ -22,7 +22,7 @@ public class Players : IReadOnlyList<Player> {
     /// </summary>
     public bool TryGetByName(string name, StringComparison comparison, [NotNullWhen(true)] out Player? player) {
         foreach (var p in _players) {
-            if (!p.Controller.playerUsername.Equals(name, comparison)) continue;
+            if (!p.Name.Equals(name, comparison)) continue;
 
             player = p;
             return true;

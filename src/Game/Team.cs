@@ -36,12 +36,24 @@ public interface ITeam {
     int TotalScore { get; }
 }
 
+/// <summary>
+/// Enum for <see cref="TeamExtensions.GetScore"/>.
+/// </summary>
 public enum TeamMetric {
+    /// <inheritdoc cref="ITeam.RoundScore"/>
     RoundScore,
+    
+    /// <inheritdoc cref="ITeam.TotalScore"/>
     TotalScore
 }
 
+/// <summary>
+/// Extension methods for <see cref="ITeam"/>.
+/// </summary>
 public static class TeamExtensions {
+    /// <summary>
+    /// Gets the team's score for a given metric.
+    /// </summary>
     public static int GetScore(this ITeam team, TeamMetric metric) {
         return metric switch {
             TeamMetric.RoundScore => team.RoundScore,
@@ -61,6 +73,8 @@ public class Team : NetworkBehaviour, ITeam {
     readonly NetworkVariable<int> _roundScore = new();
     readonly NetworkVariable<int> _totalScore = new();
     readonly NetworkVariable<int> _credits = new();
+
+    internal string[]? MembersFromDefinition;
     
     internal readonly List<Player> MembersInternal = [];
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CompetitiveCompany.Game;
+using CompetitiveCompany.Util;
 using LethalAPI.LibTerminal;
 using LethalAPI.LibTerminal.Attributes;
 using Unity.Netcode;
@@ -136,6 +137,36 @@ internal class TerminalCommands {
             return $"Joined team {team.RawName}.";
         }
     }
+    
+    [
+        TerminalCommand("scramble-teams", clearText: true),
+        CommandInfo("Randomly assign players to teams. Host only.")
+    ]
+    string ScrambleTeams() {
+        if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
+        if (!NetworkManager.Singleton.IsHost) return NoPermsMessage;
+
+        var count = new Dictionary<Team, int>();
+        foreach (var team in Session.Current.Teams) {
+            count[team] = 0;
+        }
+        
+        foreach (var player in Session.Current.Players) {
+            if (player.Team == null) continue; // don't scramble players not in a team
+
+            var smallest = count
+                .GroupBy(kvp => kvp.Value)
+                .OrderBy(grouping => grouping.Key)
+                .First()
+                .ToArray();
+            
+            var team = smallest[Random.Range(0, smallest.Length)].Key;
+            player.SetTeamFromServer(team);
+            count[team]++;
+        }
+        
+        return "Teams scrambled!";
+    }
 
     [
         TerminalCommand("create-team", clearText: true),
@@ -145,7 +176,7 @@ internal class TerminalCommands {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
         if (!CheckPerms(settings => settings.CreateAndDeleteTeamPerm)) return NoPermsMessage;
 
-        if (Session.Current.Teams.Count >= Session.MaxTeams) {
+        if (Session.Current.Teams.Count >= Plugin.MaxTeams) {
             return "Maximum number of teams reached!";
         }
 
@@ -170,7 +201,7 @@ internal class TerminalCommands {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
         if (!CheckPerms(settings => settings.CreateAndDeleteTeamPerm)) return NoPermsMessage;
 
-        if (Session.Current.Teams.Count <= Session.MinTeams) {
+        if (Session.Current.Teams.Count <= Plugin.MinTeams) {
             return "Minimum number of teams reached!";
         }
 
@@ -208,37 +239,15 @@ internal class TerminalCommands {
             return "You are not in a team!";
         }
 
-        var color = ParseColor(input);
+        var color = ColorUtil.ParseColor(input);
         if (color == null) {
-            return $"Invalid color! Please use hex format (e.g. #FF0000) or one of the following: {string.Join(", ", _colorNames.Keys)}.";
+            var colorNames = string.Join(", ", ColorUtil.ColorNames.Keys);
+            return $"Invalid color! Please use hex format (e.g. #FF0000) or one of the following: {colorNames}.";
         }
 
         team.SetColorServerRpc(color.Value);
         var hex = input.StartsWith("#") ? input : "#" + ColorUtility.ToHtmlStringRGB(color.Value);
         return $"Set color of team {team.Name} to <color={hex}>{input}</color>.";
-    }
-    
-    static readonly Dictionary<string, Color> _colorNames = new() {
-        { "red", Color.red },
-        { "green", Color.green },
-        { "blue", Color.blue },
-        { "yellow", Color.yellow },
-        { "cyan", Color.cyan },
-        { "magenta", Color.magenta },
-        { "white", Color.white },
-        { "black", Color.black }
-    };
-
-    static Color? ParseColor(string str) {
-        if (_colorNames.TryGetValue(str, out var color)) {
-            return color;
-        }
-        
-        if (ColorUtility.TryParseHtmlString(str, out color)) {
-            return color;
-        }
-        
-        return null;
     }
 
     [

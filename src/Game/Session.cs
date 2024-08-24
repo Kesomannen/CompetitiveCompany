@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using GameNetcodeStuff;
 using Unity.Collections;
 using Unity.Netcode;
@@ -66,16 +67,6 @@ public class Session : NetworkBehaviour {
     internal HashSet<ulong> CollectedItemIds { get; } = [];
 
     /// <summary>
-    /// The minimum number of teams allowed in a session.
-    /// </summary>
-    public const int MinTeams = 2;
-
-    /// <summary>
-    /// The maximum number of teams allowed in a session.
-    /// </summary>
-    public const int MaxTeams = 6;
-
-    /// <summary>
     /// Invoked right after a round has started, which happens when all
     /// players have loaded in a new moon.
     /// </summary>
@@ -139,9 +130,10 @@ public class Session : NetworkBehaviour {
         if (IsServer) {
             SyncSettings();
             ListenToConfigChanges();
-
-            CreateTeamServerRpc("Loot bugs", new Color(0.99f, 0.55f, 0.11f));
-            CreateTeamServerRpc("Manticoils", new Color(0.20f, 0.57f, 0.16f));
+            
+            foreach (var team in DefaultTeams.Get()) {
+                CreateTeamFromDefinition(team);
+            }
         }
 
         if (IsClient) {
@@ -166,6 +158,26 @@ public class Session : NetworkBehaviour {
     }
 
     /// <summary>
+    /// Creates a team from the given <see cref="TeamDefinition"/>.
+    /// This can only be called on the server.
+    /// </summary>
+    public void CreateTeamFromDefinition(TeamDefinition def) {
+        if (!IsServer) {
+            Log.Warning("CreateTeamFromDefinition can only be called on the server!");
+            return;
+        }
+        
+        CreateTeamServerRpc(def.Name, def.Color);
+        
+        var team = Teams.Get(def.Name);
+        if (team == null) {
+            Log.Error($"BUG! Team {def.Name} was not created!");
+            return;
+        }
+        team.MembersFromDefinition = def.Players;
+    }
+    
+    /// <summary>
     /// Creates a team with the given name and color.
     /// </summary>
     [ServerRpc(RequireOwnership = false)]
@@ -182,8 +194,16 @@ public class Session : NetworkBehaviour {
     void OnPlayerJoined(PlayerControllerB controller) {
         var player = controller.GetComponent<Player>();
         Log.Debug($"{player} joined the game");
-
-        player.SetTeamFromServer(Teams.GetSmallest());
+        
+        // check if player is already assigned to a team, otherwise pick the smallest one
+        var team = Teams.FirstOrDefault(team => 
+            team.MembersFromDefinition != null && 
+            team.MembersFromDefinition.Any(n => n.Equals(
+                player.Name,
+                StringComparison.OrdinalIgnoreCase
+            ))
+        ) ?? Teams.GetSmallest();
+        player.SetTeamFromServer(team);
     }
     
     void StartRound() {

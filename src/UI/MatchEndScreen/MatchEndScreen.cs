@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using CompetitiveCompany.Game;
 using CompetitiveCompany.Util;
+using FlowTween;
+using FlowTween.Components;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 namespace CompetitiveCompany.UI;
 
@@ -17,6 +21,9 @@ internal class MatchEndScreen : MonoBehaviour {
     [SerializeField] float _playerRadius = 3;   
     [SerializeField] float _playerSpacing = Mathf.PI / 8f;
     [SerializeField] float _showDuration;
+    [SerializeField] GameObject _ui;
+    [SerializeField] TMP_Text _title;
+    [SerializeField] Image _titleBackground;
     
     Camera _camera;
     Camera _gameplayCamera;
@@ -27,6 +34,8 @@ internal class MatchEndScreen : MonoBehaviour {
     static readonly int _emoteNumberID = Animator.StringToHash("emoteNumber");
     
     void Start() {
+        _ui.transform.SetParent(RoundReport.GetVanillaElement().parent);
+        
         Session.Current.OnMatchEnded += OnMatchEnded;
     }
 
@@ -55,40 +64,39 @@ internal class MatchEndScreen : MonoBehaviour {
         }
         
         _pointLight.color = ctx.WinningTeam.Color;
+        _title.text = $"{ctx.WinningTeam.Name} win!";
 
         var i = 0;
         var members = ctx.WinningTeam.Members;
-        Log.Debug($"Members: {string.Join(',', members.Select(m => m.DebugName))}");
         foreach (var member in members) {
             var model = member.transform.Find("ScavengerModel");
 
             var (position, rotation) = CalculatePlayerPosition(i, members.Count);
             var newModel = Instantiate(model, position, rotation);
             
+            // enable all the LOD renderers
             foreach (Transform child in newModel) {
                 child.gameObject.SetActive(true);
+                if (!child.TryGetComponent(out SkinnedMeshRenderer renderer)) continue;
 
-                if (child.TryGetComponent(out SkinnedMeshRenderer renderer)) {
-                    renderer.enabled = true;
-                    renderer.shadowCastingMode = ShadowCastingMode.On;
-                }
+                renderer.enabled = true;
+                renderer.shadowCastingMode = ShadowCastingMode.On;
             }
             
+            // make em dance
             var rig = newModel.Find("metarig");
             
             var animator = rig.GetComponent<Animator>();
             var emote = member.EndOfMatchEmoteChecked;
-
-            if (emote.IsVanilla()) {
-                //animator.runtimeAnimatorController = StartOfRound.Instance.localClientAnimatorController;
-            }
             
-            Log.Debug($"Setting animation for {member.DebugName} to {emote}");
-            animator.SetInteger(_emoteNumberID, (int)emote);
+            Log.Debug($"Setting emote ID for {member.DebugName} to {emote}");
+            animator.SetInteger(_emoteNumberID, emote);
             animator.SetLayerWeight(animator.GetLayerIndex("UpperBodyEmotes"), 0);
             animator.SetLayerWeight(animator.GetLayerIndex("EmotesNoArms"), 1);
             
+            // disable POV arm model
             rig.Find("ScavengerModelArmsOnly").gameObject.SetActive(false);
+            // disable cameras
             rig.Find("CameraContainer").gameObject.SetActive(false);
             
             _playerModels.Add((newModel.gameObject, member));
@@ -113,7 +121,9 @@ internal class MatchEndScreen : MonoBehaviour {
         return;
 
         IEnumerator WaitThenHide() {
+            yield return _ui.SetObjectEnabledRoutine(true);
             yield return new WaitForSeconds(_showDuration);
+            yield return _ui.SetObjectEnabledRoutine(false);
             Hide();
         }
     }
@@ -145,7 +155,7 @@ internal class MatchEndScreen : MonoBehaviour {
         StartOfRound.Instance.SwitchCamera(_gameplayCamera);
         HUDManager.Instance.HideHUD(false);
     }
-    
+
     void CreateCamera() {
         _gameplayCamera = Player.Local.Controller.gameplayCamera;
         _camera = _cameraContainer.AddComponent<Camera>();
@@ -156,11 +166,11 @@ internal class MatchEndScreen : MonoBehaviour {
         _camera.cullingMask &= ~(1 << layer);
 
         _camera.transform.rotation = Quaternion.Euler(0, 270, 0);
-        _camera.transform.localPosition = new Vector3(7.5f, 2.1f, -14.3f);
+        _camera.transform.localPosition = new Vector3(7.5f, 1.9f, -14.3f);
     }
 
     (Vector3, Quaternion) CalculatePlayerPosition(int index, int totalPlayers) {
-        Log.Debug($"_playerRadius: {_playerRadius}, _playerSpacing: {_playerSpacing}, index: {index}, totalPlayers: {totalPlayers}");
+        // trust me on this one
         
         var center = _playerPosition.position + new Vector3(_playerRadius, 0, 0);
         var centeredIndex = index - (totalPlayers - 1) / 2f;

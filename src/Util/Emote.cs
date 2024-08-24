@@ -3,7 +3,8 @@
 // We want BetterEmotes to be a soft dependency, so we can't use their Emote enum directly
 
 /// <summary>
-/// Ids of emotes, including the ones from BetterEmots.
+/// Ids of emotes, including the ones from BetterEmotes.
+/// This is only used for config, otherwise emotes are referred to directly by their ID.
 /// </summary>
 public enum Emote {
     // disable missing xml comment warnings
@@ -22,8 +23,14 @@ public enum Emote {
     #pragma warning restore 1591
 }
 
-public static class EmoteExtensions {
-    public static bool IsVanilla(this Emote emote) {
-        return (int) emote == 1 || (int) emote == 2;
+/// <summary>
+/// Utils for working with emotes.
+/// </summary>
+public static class EmoteUtil {
+    /// <summary>
+    /// Checks whether the emote ID is a vanilla emote.
+    /// </summary>
+    public static bool IsVanilla(int emoteID) {
+        return emoteID is 1 or 2;
     }
 }

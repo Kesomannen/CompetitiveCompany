@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using BepInEx;
 using CompetitiveCompany.Compat;
@@ -37,8 +38,20 @@ public class Plugin : BaseUnityPlugin {
     /// Main instance of <see cref="CompetitiveCompany.Config"/>.
     /// </summary>
     public new static Config Config { get; private set; } = null!;
+    
+    /// <summary>
+    /// The minimum number of teams allowed in a session.
+    /// </summary>
+    public const int MinTeams = 2;
+
+    /// <summary>
+    /// The maximum number of teams allowed in a session.
+    /// </summary>
+    public const int MaxTeams = 6;
 
     void Awake() {
+        var stopwatch = Stopwatch.StartNew();
+        
         Log.Debug("Loading config...");
         Config = new Config(base.Config);
         
@@ -87,7 +100,7 @@ public class Plugin : BaseUnityPlugin {
         };
         */
         
-        Log.Info("Plugin loaded!");
+        Log.Info($"Plugin loaded in {stopwatch.ElapsedMilliseconds}ms");
     }
 
     static void RunInitializeOnLoadMethods() {

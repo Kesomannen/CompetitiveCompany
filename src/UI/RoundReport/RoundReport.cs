@@ -146,7 +146,7 @@ internal class RoundReport : MonoBehaviour {
         coroutine = null;
     }
 
-    static Transform GetVanillaElement() {
+    internal static Transform GetVanillaElement() {
         return HUDManager.Instance.statsUIElements.allPlayersDeadOverlay.transform.parent.parent;
     }
     

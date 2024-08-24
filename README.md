@@ -22,6 +22,7 @@ This mod is intentionally designed to be somewhat minimal. To improve your exper
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) lets you have up to 32 players in a lobby and customize your player's appearance with cosmetics.
 - [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/) adds an in-game menu for configuring mods, including this one. Does not need to be installed by everyone.
 - [LethalCompanyVariables](https://thunderstore.io/c/lethal-company/p/AMRV/LethalCompanyVariables/) adds a ton of configuration options, including increasing the amount of scrap and monsters in the game to suit larger lobbies. Depending on your settings, this may not need to be installed by everyone.
+- [BetterEmotes](https://thunderstore.io/c/lethal-company/p/KlutzyBubbles/BetterEmotes/) adds more emotes to the game, which can be used in the end of match cutscene (see the Client config section).
 - Custom moons with [LethalLevelLoader](https://thunderstore.io/c/lethal-company/p/IAmBatby/LethalLevelLoader/). Vanilla moons can prove too small and linear for this gamemode, especially with a large number of players. Here are some recommended mods made by the community:
   - TODO
 
@@ -30,7 +31,7 @@ This mod is intentionally designed to be somewhat minimal. To improve your exper
 Teams are managed through custom terminal commands:
 
 | Command                  | Description                                                                                                                                                   |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------------------ |---------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `join <team> [player]`   | Join a team. The host can join other players by specifying their username as the last argument.                                                               |
 | `list-teams`             | Lists all teams and their scores.                                                                                                                             |
 | `create-team <name>`     | Creates a new team with the given name. By default, only the host can use this.                                                                               |
@@ -38,19 +39,45 @@ Teams are managed through custom terminal commands:
 | `set-team-name <name>`   | Changes the name of your current team. The max length for team names is 64 characters.                                                                        |
 | `set-team-color <color>` | Changes the color of your current team. The color can be one of red, green, blue, yellow, cyan, magenta, white or black, or a custom hex code (e.g. #FF0000). |
 | `settings`               | View the current match settings.                                                                                                                              |
+| `scramble-teams`         | Randomly assigns players to teams. Only the host can use this.                                                                                                |
 
 This information can also be found in-game by running the `other` command.
 
 ## Configuration
 
-Configuration is done via a normal `.cfg` file. Every option except those in the `Client` section are server-side and can only be set by the host. The options take effect immediately, meaning you can configure match settings on the fly with a mod like [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/).
+Most configuration is done via a normal `.cfg` file. Every option except those in the `Client` section are server-side and can only be set by the host. The options take effect immediately, meaning you can configure match settings on the fly with a mod like [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/).
+
+Additionally you can define a custom set of default teams that will be created each time you start a lobby. This is done via a `default_teams.json` file in the config folder. Any players you specify will be put into that team after joining. For example:
+```json
+[
+  {
+    "name": "Milk enjoyers",
+    "color": "white",
+    "players": [
+      "Kesomannen"
+    ]
+  },
+  {
+    "name": "Orange juice fans",
+    "color": "#e0701b"
+  },
+  {
+    "name": "Water drinkers",
+    "color": "aqua",
+    "players": [
+      "agmas",
+      "frostycirno"
+    ]
+  }
+]
+```
 
 ## Planned Features
 
-- [ ] Saving & loading
 - [ ] Controlled lever pulling
   - Make it so once a team pulls the lever, the ship leaves within a configurable time frame instead of immediately. The team who pulls will go into spectator mode while the others have to scramble to get on the ship.
 - [ ] Spectator role
+- [ ] Saving & loading
 - [ ] Controlled moon selection
   - Make it so only one team can select the next moon to go to. This will be configurable to either be the losers pick or cycle through the teams.
 - [ ] Better team management

@@ -40,7 +40,7 @@ source = "lib/FlowTween.dll"
 target = "plugins/FlowTween.dll"
 
 [[build.copy]]
-source = "bundles/competitive-company"
+source = "assets/competitive-company"
 target = "plugins/competitive-company"
 
 [publish]

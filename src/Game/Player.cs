@@ -43,7 +43,7 @@ public class Player : NetworkBehaviour {
     }
     
     readonly NetworkVariable<bool> _isSpectating = new(writePerm: NetworkVariableWritePermission.Owner);
-    readonly NetworkVariable<Emote> _endOfMatchEmote = new(writePerm: NetworkVariableWritePermission.Owner);
+    readonly NetworkVariable<int> _endOfMatchEmote = new(writePerm: NetworkVariableWritePermission.Owner);
 
     /// <summary>
     /// The vanilla controller of the player.
@@ -63,19 +63,27 @@ public class Player : NetworkBehaviour {
     public bool IsSpectating => _isSpectating.Value;
     
     /// <summary>
-    /// The <see cref="Emote"/> to play at the end of the match, 
+    /// The Emote ID to play at the end of the match, 
     /// picked by the player's owner. Note that still may return an emote that doesn't
     /// exist if BetterEmotes is not installed. <see cref="EndOfMatchEmoteChecked"/> accounts for this.
     /// </summary>
-    public Emote EndOfMatchEmote => _endOfMatchEmote.Value;
+    public int EndOfMatchEmote => _endOfMatchEmote.Value;
     
     /// <summary>
     /// Whether the player is controlled by the host/server of the game.
     /// </summary>
     public bool OwnedByHost => OwnerClientId == NetworkManager.ServerClientId;
 
+    /// <summary>
+    /// Alias for <c>Controller.isPlayerControlled</c>.
+    /// </summary>
     public bool IsControlled => Controller.isPlayerControlled;
-
+    
+    /// <summary>
+    /// Alias for <c>Controller.playerUsername</c>.
+    /// </summary>
+    public string Name => Controller.playerUsername;
+    
     Session _session = null!;
     
     /// <summary>
@@ -92,19 +100,19 @@ public class Player : NetworkBehaviour {
                 title += " + Local";
             }
 
-            return $"{Controller.playerUsername} [{team}] ({title})";
+            return $"{Name} [{team}] ({title})";
         }
     }
     
     /// <summary>
-    /// The <see cref="Emote"/> to play at the end of the match, picked by the player's owner.
+    /// The Emote ID to play at the end of the match, picked by the player's owner.
     /// This checks if BetterEmotes is loaded to make sure the emote is valid.
     /// If the player has picked an invalid emote, this falls back to <see cref="Emote.Dance"/>.
     /// </summary>
-    public Emote EndOfMatchEmoteChecked {
+    public int EndOfMatchEmoteChecked {
         get {
-            if (!Chainloader.PluginInfos.ContainsKey("BetterEmotes") && !EndOfMatchEmote.IsVanilla()) {
-                return Emote.Dance;
+            if (!Chainloader.PluginInfos.ContainsKey("BetterEmotes") && !EmoteUtil.IsVanilla(EndOfMatchEmote)) {
+                return (int) Emote.Dance;
             }
             
             return EndOfMatchEmote;
@@ -136,7 +144,7 @@ public class Player : NetworkBehaviour {
         IEnumerator Routine() {
             yield return null;
             var setting = Plugin.Config.EndOfMatchEmote;
-            _endOfMatchEmote.Value = setting.Value;
+            _endOfMatchEmote.Value = (int)setting.Value;
             setting.SettingChanged += OnEndOfMatchEmoteChanged;
         }
     }
@@ -245,7 +253,7 @@ public class Player : NetworkBehaviour {
     }
     
     void OnTeamNameChanged(in FixedString128Bytes newValue) {
-        Controller.usernameBillboardText.text = $"({newValue}) {Controller.playerUsername}";
+        Controller.usernameBillboardText.text = $"({newValue}) {Name}";
     }
 
     static void OnTeamCreditsChanged(int credits) {
@@ -308,7 +316,7 @@ public class Player : NetworkBehaviour {
     }
     
     void OnEndOfMatchEmoteChanged(object sender, EventArgs e) {
-        _endOfMatchEmote.Value = Plugin.Config.EndOfMatchEmote.Value;
+        _endOfMatchEmote.Value = (int)Plugin.Config.EndOfMatchEmote.Value;
     }
 
     /// <summary>

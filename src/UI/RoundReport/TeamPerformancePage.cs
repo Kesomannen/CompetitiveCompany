@@ -36,7 +36,7 @@ internal class TeamPerformancePage : MonoBehaviour {
             var stats = StartOfRound.Instance.gameStats.allPlayerStats[member.Controller.playerClientId];
             
             var memberUI = Instantiate(_memberPrefab, _memberContainer);
-            memberUI.Initialize(member.Controller.playerUsername, stats.playerNotes, outcome);
+            memberUI.Initialize(member.Name, stats.playerNotes, outcome);
             
             _memberUIs.Add(memberUI);
         }
