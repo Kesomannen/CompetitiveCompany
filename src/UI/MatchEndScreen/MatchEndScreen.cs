@@ -40,6 +40,7 @@ internal class MatchEndScreen : MonoBehaviour {
     }
 
     void Update() {
+        return;
         if (_cameraContainer.gameObject.activeInHierarchy) return;
         
         if (Keyboard.current.gKey.wasPressedThisFrame) {

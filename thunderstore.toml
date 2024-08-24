@@ -17,7 +17,7 @@ Evaisa-LethalLib = "0.16.1"
 Evaisa-HookGenPatcher = "0.0.5"
 
 [build]
-icon = "icon.png"
+icon = "assets/icon.png"
 
 [[build.copy]]
 source = "CHANGELOG.md"
