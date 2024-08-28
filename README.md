@@ -161,6 +161,7 @@ Make sure you have the following installed:
 - [Git](https://git-scm.com/)
 - [.NET SDK 8.0](https://dotnet.microsoft.com/download/dotnet/6.0)
 - [UnityNetcodePatcher CLI](https://github.com/EvaisaDev/UnityNetcodePatcher?tab=readme-ov-file#cli)
+- [Thunderstore CLI]() (only needed for the `Release` configuration)
 
 ---
 

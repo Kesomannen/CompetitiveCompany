@@ -35,6 +35,9 @@ internal static class LethalConfigCompat {
             Generate(config.ShowEndOfMatchCutscene),
             Generate(config.ShowMouseOnRoundReport),
             Generate(config.EndOfMatchEmote),
+            Generate(config.DisableAutoPilot),
+            Generate(config.MinLeaveTime),
+            Generate(config.TimeToLeave)
         };
         
         foreach (var baseConfigItem in items) {

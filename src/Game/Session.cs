@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using CompetitiveCompany.Util;
 using GameNetcodeStuff;
 using Unity.Collections;
 using Unity.Netcode;
@@ -295,6 +296,10 @@ public class Session : NetworkBehaviour {
         _.FriendlyFire.SettingChanged += OnSyncedEntryChanged;
         _.ShipSafeRadius.SettingChanged += OnSyncedEntryChanged;
         _.NumberOfRounds.SettingChanged += OnSyncedEntryChanged;
+        
+        _.DisableAutoPilot.SettingChanged += OnSyncedEntryChanged;
+        _.MinLeaveTime.SettingChanged += OnSyncedEntryChanged;
+        _.TimeToLeave.SettingChanged += OnSyncedEntryChanged;
 
         _.JoinTeamPerm.SettingChanged += OnSyncedEntryChanged;
         _.CreateAndDeleteTeamPerm.SettingChanged += OnSyncedEntryChanged;
@@ -307,6 +312,10 @@ public class Session : NetworkBehaviour {
         _.FriendlyFire.SettingChanged -= OnSyncedEntryChanged;
         _.ShipSafeRadius.SettingChanged -= OnSyncedEntryChanged;
         _.NumberOfRounds.SettingChanged -= OnSyncedEntryChanged;
+        
+        _.DisableAutoPilot.SettingChanged -= OnSyncedEntryChanged;
+        _.MinLeaveTime.SettingChanged -= OnSyncedEntryChanged;
+        _.TimeToLeave.SettingChanged -= OnSyncedEntryChanged;
         
         _.JoinTeamPerm.SettingChanged -= OnSyncedEntryChanged;
         _.CreateAndDeleteTeamPerm.SettingChanged -= OnSyncedEntryChanged;

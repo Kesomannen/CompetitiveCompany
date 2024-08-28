@@ -19,7 +19,13 @@ public struct NetworkedSettings(Config config) : INetworkSerializable {
     public int NumberOfRounds = config.NumberOfRounds.Value;
     /// <inheritdoc cref="Config.ShipSafeRadius"/>
     public float ShipSafeRadius = config.ShipSafeRadius.Value;
-
+    /// <inheritdoc cref="Config.DisableAutoPilot"/>
+    public bool DisableAutoPilot = config.DisableAutoPilot.Value;
+    /// <inheritdoc cref="Config.MinLeaveTime"/>
+    public float MinLeaveTime = config.MinLeaveTime.Value;
+    /// <inheritdoc cref="Config.TimeToLeave"/>
+    public float TimeToLeave = config.TimeToLeave.Value;
+    
     /// <inheritdoc cref="Config.JoinTeamPerm"/>
     public Permission JoinTeamPerm = config.JoinTeamPerm.Value;
     /// <inheritdoc cref="Config.CreateAndDeleteTeamPerm"/>

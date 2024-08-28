@@ -50,19 +50,58 @@ public class Config(ConfigFile file) {
     );
 
     /// <summary>
-    /// The radius around the ship where players can't damage eachother.
+    /// The radius in meters around the ship's center where players can't damage eachother.
     /// Both the attacker and the victim are required to be outside the radius for damage to be dealt.
-    /// Set to 0 to disable.
+    /// For scale, the distance to the edge of the ship's balcony is about 13 meters.
+    /// The entrance to Experimentation is approximately 100 meters away.
     /// </summary>
     public ConfigEntry<float> ShipSafeRadius { get; } = file.Bind(
         "General",
         "ShipSafeRadius",
-        10f,
-        "The radius around the ship where players can't damage eachother.\n" +
+        20f,
+        "The radius in meters around the ship's center where players can't damage eachother.\n" +
         "Both the attacker and the victim are required to be outside the radius for damage to be dealt.\n" +
-        "Set to 0 to disable."
+        "For scale, the distance to the edge of the ship's balcony is about 13 meters." +
+        "The entrance to Experimentation is approximately 100 meters away."
     );
-    
+
+    /// <summary>
+    /// Whether to disable the "vote-to-leave" spectator vote.
+    /// </summary>
+    public ConfigEntry<bool> DisableAutoPilot { get; } = file.Bind(
+        "General",
+        "DisableAutoPilot",
+        true,
+        "Whether to disable the \"vote-to-leave\" spectator vote."
+    );
+
+    /// <summary>
+    /// The minimum time a player can pull the lever to start leaving the current moon.
+    /// Specified in hours on a 24-hour clock (the ship arrives at 8 and leaves at 24).
+    /// </summary>
+    public ConfigEntry<float> MinLeaveTime { get; } = file.Bind(
+        "General",
+        "MinimumLeaveTime",
+        11f,
+        new ConfigDescription(
+            "The earliest in-game time a player can pull the lever to starting leaving the current moon." +
+            "Specified in hours on a 24-hour clock (the ship arrives at 8 and leaves at 24).",
+            new AcceptableValueRange<float>(8f, 24f)
+        )
+    );
+
+    /// <summary>
+    /// How many in-game hours it takes for the ship to leave after the lever is pulled.
+    /// </summary>
+    public ConfigEntry<float> TimeToLeave { get; } = file.Bind(
+        "General",
+        "TimeToLeave",
+        1f,
+        new ConfigDescription(
+            "How many in-game hours it takes for the ship to leave after the lever is pulled.",
+            new AcceptableValueRange<float>(0f, 16f)
+        )
+    );
 
     /// <summary>
     /// Who can use the 'join' command.

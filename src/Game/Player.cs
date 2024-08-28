@@ -9,6 +9,7 @@ using MonoMod.Cil;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using LogLevel = BepInEx.Logging.LogLevel;
 
 namespace CompetitiveCompany.Game;
@@ -42,7 +43,7 @@ public class Player : NetworkBehaviour {
         }
     }
     
-    readonly NetworkVariable<bool> _isSpectating = new(writePerm: NetworkVariableWritePermission.Owner);
+    readonly NetworkVariable<bool> _isSpectating = new();
     readonly NetworkVariable<int> _endOfMatchEmote = new(writePerm: NetworkVariableWritePermission.Owner);
 
     /// <summary>
@@ -58,9 +59,13 @@ public class Player : NetworkBehaviour {
     public Team? Team { get; private set; }
 
     /// <summary>
-    /// Whether the player is spectating.
+    /// Whether the player is spectating. Can directly be set on the server, and indirectly
+    /// on the local player with <see cref="StartSpectatingServerRpc"/> and <see cref="StopSpectatingServerRpc"/>.
     /// </summary>
-    public bool IsSpectating => _isSpectating.Value;
+    public bool IsSpectating {
+        get => _isSpectating.Value;
+        set => _isSpectating.Value = value;
+    }
     
     /// <summary>
     /// The Emote ID to play at the end of the match, 
@@ -134,6 +139,12 @@ public class Player : NetworkBehaviour {
         Controller = GetComponent<PlayerControllerB>();
     }
 
+    void Update() {
+        if (Keyboard.current.iKey.wasPressedThisFrame) {
+            _isSpectating.Value = !_isSpectating.Value;
+        }
+    }
+
     /// <inheritdoc />
     public override void OnGainedOwnership() {
         base.OnGainedOwnership();
@@ -142,7 +153,10 @@ public class Player : NetworkBehaviour {
         return;
 
         IEnumerator Routine() {
+            // for some reason ownership isn't actually being transferred until a few frames later
             yield return null;
+            yield return null;
+            
             var setting = Plugin.Config.EndOfMatchEmote;
             _endOfMatchEmote.Value = (int)setting.Value;
             setting.SettingChanged += OnEndOfMatchEmoteChanged;
@@ -166,6 +180,8 @@ public class Player : NetworkBehaviour {
         if (_teamReference.Value.TryGet(out var team)) {
             JoinTeam(team);
         }
+
+        _isSpectating.OnValueChanged += OnIsSpectatingChanged;
     }
 
     /// <inheritdoc />
@@ -177,6 +193,8 @@ public class Player : NetworkBehaviour {
         if (Team != null) {
             LeaveTeam(Team);
         }
+        
+        _isSpectating.OnValueChanged -= OnIsSpectatingChanged;
     }
 
     void OnTeamReferenceChanged(TeamRef previous, TeamRef current) {
@@ -318,43 +336,31 @@ public class Player : NetworkBehaviour {
     void OnEndOfMatchEmoteChanged(object sender, EventArgs e) {
         _endOfMatchEmote.Value = (int)Plugin.Config.EndOfMatchEmote.Value;
     }
+    
+    void OnIsSpectatingChanged(bool prev, bool current) {
+        Controller.DisablePlayerModel(gameObject, !current);
+        Controller.isPlayerControlled = !current;
+        //Controller.isPlayerDead = current;
+            
+        if (!IsOwner) return;
 
-    /// <summary>
-    /// Starts spectating the game. Can only be called on the local player.
-    /// </summary>
-    public void StartSpectating() {
-        if (!IsOwner) {
-            PlayerLog("StartSpectating can only be called on the local player", LogLevel.Error);
-            return;
+        if (current) {
+            SpectatorController.Instance.EnableCam();
+        } else {
+            SpectatorController.Instance.DisableCam();
         }
-        
-        if (IsSpectating) return;
-        _isSpectating.Value = true;
-        
-        ClearTeamServerRpc();
-        
-        Controller.gameObject.SetActive(false);
-        Controller.isPlayerControlled = false;
-        SpectatorController.Instance.EnableCam();
     }
-
-    /// <summary>
-    /// Stops spectating the game. Can only be called on the local player.
-    /// </summary>
-    public void StopSpectating() {
-        if (!IsOwner) {
-            PlayerLog("StopSpectating can only be called on the local player", LogLevel.Error);
-            return;
-        }
-        
-        if (!IsSpectating) return;
+    
+    [ServerRpc]
+    public void StartSpectatingServerRpc() {
+        ClearTeamFromServer();
+        _isSpectating.Value = true;
+    }
+    
+    [ServerRpc]
+    public void StopSpectatingServerRpc() {
+        SetTeamFromServer(_session.Teams.GetSmallest());
         _isSpectating.Value = false;
-        
-        SetTeamServerRpc(_session.Teams.GetSmallest());
-        
-        Controller.gameObject.SetActive(true);
-        Controller.isPlayerControlled = true;
-        SpectatorController.Instance.DisableCam();
     }
 
     /// <inheritdoc />

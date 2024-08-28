@@ -13,41 +13,38 @@
 //    copies or substantial portions of the Software.
 
 using GameNetcodeStuff;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-//using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace CompetitiveCompany;
 
-public class SpectatorController : MonoBehaviour {
-    public static SpectatorController Instance { get; private set; } = null!;
-    public PlayerControllerB ClientPlayer { get; private set; } = null!;
+internal class SpectatorController : MonoBehaviour {
+    #nullable disable // fields are assigned in Awake
+    public static SpectatorController Instance { get; private set; }
 
-    readonly Light[] _lights = new Light[4];
-    Camera _cam = null!;
-    float _camMoveSpeed = 5f;
-
-    Transform _hintPanelRoot;
-    Transform _hintPanelOrigParent;
-    Transform _deathUIRoot;
-    TextMeshProUGUI _controlsText;
+    const float CamMoveSpeed = 5f;
     
+    readonly Light[] _lights = new Light[4];
+    
+    PlayerControllerB _localPlayer;
+    Camera _cam;
+
+    InputAction _upAction;
+    InputAction _downAction;
+    InputAction _sprintAction;
+    InputAction _moveAction;
+    
+    #nullable restore
+
     bool _controlsHidden = true;
-    float _accelTime = -1;
-    float _decelTime = -1;
-    bool _altitudeLock;
 
     public static void Spawn() {
         var obj = new GameObject("SpectatorController", typeof(Camera), typeof(SpectatorController), typeof(AudioListener));
         DontDestroyOnLoad(obj);
     }
     
-    /**
-     * On awake, make and grab the light
-     */
     void Awake() {
-        //If the instance already exists, abort!
         if (Instance != null) {
             Destroy(this);
             return;
@@ -70,83 +67,56 @@ public class SpectatorController : MonoBehaviour {
             //Actually make everything
             var lightObj = new GameObject("GhostLight" + i);
             var light = lightObj.AddComponent<Light>();
-            //var lightData = lightObj.AddComponent<HDAdditionalLightData>();
+            var lightData = lightObj.AddComponent<HDAdditionalLightData>();
             lightObj.transform.eulerAngles = dir;
             light.type = LightType.Directional;
             light.shadows = LightShadows.None;
-            //light.intensity = Plugin.Config.SpectatorLightIntensity.Value;
+            light.intensity = 10f;
             lightObj.hideFlags = HideFlags.DontSave;
-            //lightData.affectsVolumetric = false;
+            lightData.affectsVolumetric = false;
             _lights[i] = light;
         }
 
-        //Grab the camera and change the mask to include invisible enemies
+        var actions = IngamePlayerSettings.Instance.playerInput.actions;
+        _upAction = actions.FindAction("Jump");
+        _downAction = actions.FindAction("Crouch");
+        _sprintAction = actions.FindAction("Sprint");
+        _moveAction = actions.FindAction("Move");
+
         _cam = GetComponent<Camera>();
-        _cam.cullingMask |= 1 << 23;
 
         DisableCam();
     }
-
-    /**
-     * Enables the spectator camera
-     */
+    
     public void EnableCam() {
         if (gameObject.activeSelf) return;
+
         gameObject.SetActive(true);
 
-        //Move the camera
         transform.parent = null;
-        var oldCam = StartOfRound.Instance.activeCamera.transform;
-        transform.position = oldCam.position;
-        transform.rotation = oldCam.rotation;
+        var startOfRound = StartOfRound.Instance;
+        var oldCam = startOfRound.activeCamera;
 
-        //If we don't have them, need to grab certain objects
-        if (_hintPanelRoot == null) {
-            _hintPanelRoot = HUDManager.Instance.tipsPanelAnimator.transform.parent;
-            _hintPanelOrigParent = _hintPanelRoot.parent;
-            _deathUIRoot = HUDManager.Instance.SpectateBoxesContainer.transform.parent;
+        _cam.CopyFrom(oldCam);
+        // exclude helmet visor
+        var layer = LayerMask.NameToLayer("HelmetVisor");
+        _cam.cullingMask &= ~(1 << layer);
+        // include invisible enemies
+        _cam.cullingMask |= 1 << 23;
 
-            //Also, make the controls display guy
-            var go = Instantiate(HUDManager.Instance.holdButtonToEndGameEarlyText.gameObject, _deathUIRoot);
-            _controlsText = go.GetComponent<TextMeshProUGUI>();
-            go.name = "PoltergeistControlsText";
-        }
+        //Move the camera
+        transform.position = oldCam.transform.position;
+        transform.rotation = oldCam.transform.rotation;
 
-        _hintPanelRoot.parent = _deathUIRoot;
+        startOfRound.localPlayerController.ChangeAudioListenerToObject(gameObject);
+        startOfRound.localPlayerController.gameplayCamera.enabled = false;
+        startOfRound.SwitchCamera(_cam);
 
         UpdateControlText();
+
+        Log.Debug("Spectator camera enabled!");
     }
-
-    void UpdateControlText() {
-        var keybinds = Plugin.Config.Keybinds;
-
-        //If it's hidden, only show how to toggle it
-        if (_controlsHidden) {
-            _controlsText.text = $"Show Spectator Controls; [{_(keybinds.ToggleSpectatorControls)}]";
-            return;
-        }
-
-        //If it's not hidden, show everything
-        _controlsText.text =
-            $"""
-             Hide Spectator Controls: [{_(keybinds.ToggleSpectatorControls)}]
-             Increase Speed: [{_(keybinds.SpectatorAccelerate)}]
-             Decrease Speed: [{_(keybinds.SpectatorDecelerate)}]
-             Up: [{_(keybinds.SpectatorUp)}]
-             Down: [{_(keybinds.SpectatorDown)}]
-             Lock Altitude: [{_(keybinds.SpectatorLockAltitude)}]
-             Toggle Light: [{_(keybinds.SpectatorToggleLight)}]
-             """;
-        return;
-
-        string _(InputAction action) {
-            return action.GetBindingDisplayString();
-        }
-    }
-
-    /**
-     * Disables the spectator camera
-     */
+    
     public void DisableCam() {
         if (!gameObject.activeSelf) return;
         gameObject.SetActive(false);
@@ -155,18 +125,38 @@ public class SpectatorController : MonoBehaviour {
             light.enabled = false;
         }
 
-        _altitudeLock = false;
-
-        if (_hintPanelRoot != null) {
-            _hintPanelRoot.parent = _hintPanelOrigParent;
-        }
-
-        _controlsHidden = true;
+        HUDManager.Instance?.ClearControlTips();
     }
 
-    /**
-     * When the left mouse is clicked, switch the light
-     */
+    void UpdateControlText() {
+        var keybinds = Plugin.Config.Keybinds;
+        var vanillaKeybinds = IngamePlayerSettings.Instance.playerInput.actions;
+
+        //If it's hidden, only show how to toggle it
+        if (_controlsHidden) {
+            HUDManager.Instance.ChangeControlTip(0, $"Show Spectator Controls : [{_(keybinds.ToggleSpectatorControls)}]", clearAllOther: true);
+            return;
+        }
+
+        //If it's not hidden, show everything
+        HUDManager.Instance.ChangeControlTip(0,
+            $"""
+             Hide Spectator Controls : [{_(keybinds.ToggleSpectatorControls)}]
+             Up : [{_(vanillaKeybinds["Jump"])}]
+             Down : [{_(vanillaKeybinds["Crouch"])}]
+             Toggle Light : [{_(keybinds.SpectatorToggleLight)}]
+             Teleport to Player : [0-{StartOfRound.Instance.connectedPlayersAmount - 1}]
+             """,
+            clearAllOther: true
+        );
+        return;
+
+        string _(InputAction action) {
+            // for some reason GetBindingDisplayString() returns the keybind with a pipe character
+            return action.GetBindingDisplayString();
+        }
+    }
+    
     void ToggleLight(InputAction.CallbackContext context) {
         //Cancel if this isn't a "performed" action
         if (!context.performed) {
@@ -174,7 +164,7 @@ public class SpectatorController : MonoBehaviour {
         }
 
         //If in the right conditions, switch the light
-        if (ClientPlayer is { isPlayerDead: true, isTypingChat: false } && !ClientPlayer.quickMenuManager.isMenuOpen) {
+        if (_localPlayer is { isPlayerDead: true, isTypingChat: false } && !_localPlayer.quickMenuManager.isMenuOpen) {
             foreach (var light in _lights) {
                 light.enabled = !light.enabled;
             }
@@ -205,39 +195,8 @@ public class SpectatorController : MonoBehaviour {
         transform.rotation = player.gameplayCamera.transform.rotation;
 
         //Apply the effects
-        ClientPlayer.spectatedPlayerScript = player;
-        ClientPlayer.SetSpectatedPlayerEffects();
-    }
-
-    /**
-     * When scrolling up is done, set the camera up to change speed
-     */
-    void Accelerate(InputAction.CallbackContext context) {
-        _accelTime = Time.time + 0.3f;
-        _decelTime = -1;
-    }
-
-    /**
-     * When scrolling down is done, set the camera up to change speed
-     */
-    void Decelerate(InputAction.CallbackContext context) {
-        _decelTime = Time.time + 0.3f;
-        _accelTime = -1;
-    }
-
-    /**
-     * Lock the player's altitude for the standard movement
-     */
-    void LockAltitude(InputAction.CallbackContext context) {
-        if (!context.performed) {
-            return;
-        }
-
-        if (ClientPlayer.isTypingChat || ClientPlayer.quickMenuManager.isMenuOpen) {
-            return;
-        }
-
-        _altitudeLock = !_altitudeLock;
+        _localPlayer.spectatedPlayerScript = player;
+        _localPlayer.SetSpectatedPlayerEffects();
     }
 
     /**
@@ -250,7 +209,7 @@ public class SpectatorController : MonoBehaviour {
         }
 
         //Don't do things if paused
-        if (ClientPlayer.isTypingChat || ClientPlayer.quickMenuManager.isMenuOpen) {
+        if (_localPlayer.isTypingChat || _localPlayer.quickMenuManager.isMenuOpen) {
             return;
         }
 
@@ -262,18 +221,12 @@ public class SpectatorController : MonoBehaviour {
     void OnEnable() {
         var keybinds = Plugin.Config.Keybinds;
         keybinds.SpectatorToggleLight.performed += ToggleLight;
-        keybinds.SpectatorAccelerate.performed += Accelerate;
-        keybinds.SpectatorDecelerate.performed += Decelerate;
-        keybinds.SpectatorLockAltitude.performed += LockAltitude;
         keybinds.ToggleSpectatorControls.performed += ToggleControls;
     }
 
     void OnDisable() {
         var keybinds = Plugin.Config.Keybinds;
         keybinds.SpectatorToggleLight.performed -= ToggleLight;
-        keybinds.SpectatorAccelerate.performed -= Accelerate;
-        keybinds.SpectatorDecelerate.performed -= Decelerate;
-        keybinds.SpectatorLockAltitude.performed -= LockAltitude;
         keybinds.ToggleSpectatorControls.performed -= ToggleControls;
     }
 
@@ -281,26 +234,12 @@ public class SpectatorController : MonoBehaviour {
      * When destroyed, need to manually destroy the ghost light
      */
     void OnDestroy() {
-        Log.Warning("SpectatorController destroyed!");
+        Log.Debug("SpectatorController destroyed");
+
         foreach (var light in _lights) {
             if (light != null) {
                 Destroy(light.gameObject);
             }
-        }
-    }
-
-    void PositionControlText() {
-        //Figure out where to actually put the text
-        var tf = _controlsText.transform;
-        var bounds = HUDManager.Instance.holdButtonToEndGameEarlyVotesText.textBounds;
-
-        //Need to account for the votes text being empty
-        if (bounds.m_Extents.y < 0) {
-            tf.position = new Vector3(tf.position.x, HUDManager.Instance.holdButtonToEndGameEarlyVotesText.transform.position.y, tf.position.z);
-        } else {
-            tf.localPosition = new Vector3(tf.localPosition.x,
-                (bounds.min + HUDManager.Instance.holdButtonToEndGameEarlyVotesText.transform.localPosition).y - (_controlsText.bounds.extents.y + 22),
-                tf.localPosition.z);
         }
     }
 
@@ -309,23 +248,23 @@ public class SpectatorController : MonoBehaviour {
      */
     void LateUpdate() {
         //Need to wait for the player controller to be registered
-        if (ClientPlayer == null) {
-            ClientPlayer = StartOfRound.Instance.localPlayerController;
+        if (_localPlayer == null) {
+            _localPlayer = StartOfRound.Instance.localPlayerController;
 
-            if (ClientPlayer == null) {
+            if (_localPlayer == null) {
                 return;
             }
         }
 
         //Take raw inputs
-        var moveInput = IngamePlayerSettings.Instance.playerInput.actions.FindAction("Move").ReadValue<Vector2>();
-        var lookInput = ClientPlayer.playerActions.Movement.Look.ReadValue<Vector2>() * 0.008f * IngamePlayerSettings.Instance.settings.lookSensitivity;
+        var moveInput = _moveAction.ReadValue<Vector2>();
+        var lookInput = _localPlayer.playerActions.Movement.Look.ReadValue<Vector2>() * 0.008f * IngamePlayerSettings.Instance.settings.lookSensitivity;
 
         if (!IngamePlayerSettings.Instance.settings.invertYAxis) {
             lookInput.y *= -1f;
         }
 
-        var sprint = IngamePlayerSettings.Instance.playerInput.actions.FindAction("Sprint").ReadValue<float>() > 0.3f;
+        var sprint = _sprintAction.ReadValue<float>() > 0.3f;
 
         transform.Rotate(0, lookInput.x, 0, Space.World);
 
@@ -341,61 +280,20 @@ public class SpectatorController : MonoBehaviour {
         }
 
         //Move the camera
-        var curMoveSpeed = _camMoveSpeed;
+        var curMoveSpeed = CamMoveSpeed;
 
         if (sprint) {
             curMoveSpeed *= 5;
         }
 
         var rightMove = transform.right * moveInput.x * curMoveSpeed * Time.deltaTime;
-        Vector3 forwardMove;
-
-        //Normally, just move forward
-        if (!_altitudeLock) {
-            forwardMove = transform.forward * moveInput.y * curMoveSpeed * Time.deltaTime;
-        }
-
-        //If their altitude is locked, need special logic
-        else {
-            //If they're facing straight down, actually take the up vector
-            if (transform.forward.y < -0.99) {
-                forwardMove = transform.up;
-            }
-
-            //If they're facing straight up, actually take the down vector
-            else if (transform.forward.y > 0.99) {
-                forwardMove = transform.up * -1;
-            }
-
-            //Otherwise, take the forward vector
-            else {
-                forwardMove = transform.forward;
-            }
-
-            //Trim the y component to prevent vertical motion
-            forwardMove.y = 0;
-            forwardMove = forwardMove.normalized;
-            forwardMove = forwardMove * moveInput.y * curMoveSpeed * Time.deltaTime;
-        }
-
+        var forwardMove = transform.forward * moveInput.y * curMoveSpeed * Time.deltaTime;
         transform.position += rightMove + forwardMove;
-
-        //Handle the vertical controls
-        var keybinds = Plugin.Config.Keybinds;
-
-        var vertMotion = (keybinds.SpectatorUp.ReadValue<float>() - keybinds.SpectatorDown.ReadValue<float>()) *
+        
+        var vertMotion = (_upAction.ReadValue<float>() - _downAction.ReadValue<float>()) *
                          curMoveSpeed *
                          Time.deltaTime;
         transform.position += Vector3.up * vertMotion;
-
-        //Actually do the speed change
-        if (_accelTime > Time.time) {
-            _camMoveSpeed += Time.deltaTime * _camMoveSpeed;
-            _camMoveSpeed = Mathf.Clamp(_camMoveSpeed, 0, 100);
-        } else if (_decelTime > Time.time) {
-            _camMoveSpeed -= Time.deltaTime * _camMoveSpeed;
-            _camMoveSpeed = Mathf.Clamp(_camMoveSpeed, 0, 100);
-        }
 
         //Lets the player teleport to other players
         var teleIndex = -1;
@@ -408,7 +306,7 @@ public class SpectatorController : MonoBehaviour {
         }
 
         if (teleIndex != -1) {
-            PlayerControllerB[] playerList = StartOfRound.Instance.allPlayerScripts;
+            var playerList = StartOfRound.Instance.allPlayerScripts;
 
             if (teleIndex >= playerList.Length) {
                 HUDManager.Instance.DisplayTip("Cannot Teleport", "Specified player index is invalid!", isWarning: true);
@@ -416,14 +314,15 @@ public class SpectatorController : MonoBehaviour {
                 TeleportToPlayer(playerList[teleIndex]);
             }
         }
-
-        PositionControlText();
-
+        
         foreach (var player in StartOfRound.Instance.allPlayerScripts) {
-            if (player == ClientPlayer || !player.isPlayerControlled) continue;
+            if (player == _localPlayer || !player.isPlayerControlled) continue;
 
             player.ShowNameBillboard();
             player.usernameBillboard.LookAt(transform.position);
         }
+
+        // PlayerControllerB shuts this off if no gameplay camera is active, prevent that
+        _localPlayer.playerScreen.enabled = true;
     }
 }

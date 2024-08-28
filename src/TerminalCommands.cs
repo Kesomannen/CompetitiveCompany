@@ -31,21 +31,37 @@ internal class TerminalCommands {
         return $"Current game settings:\n\n" +
                $"Friendly fire: {FormatBool(settings.FriendlyFire)}\n" +
                $"Number of rounds: {settings.NumberOfRounds}\n" +
-               $"Ship safe radius: {settings.ShipSafeRadius}m";
+               $"Ship safe radius: {settings.ShipSafeRadius}m\n" +
+               $"Autopilot: {FormatBool(!settings.DisableAutoPilot)}\n" +
+               $"Earliest ship start time: {FormatTimeOfDay(settings.MinLeaveTime)}\n" +
+               $"Ship leave time: {FormatTimeSpan(settings.TimeToLeave)}";
         
         string FormatBool(bool value) => value ? "Enabled" : "Disabled";
+
+        string FormatTimeSpan(float hours) {
+            var span = TimeSpan.FromHours(hours);
+            return span.Minutes == 0 ? $"{span.Hours}h" : $"{span.Hours}h {span.Minutes}m";
+        }
+        
+        string FormatTimeOfDay(float hours) {
+            // input in 24 hour click, output in 12 hour clock, 
+            var span = TimeSpan.FromHours(hours);
+            var amPm = span.Hours < 12 ? "AM" : "PM";
+            hours = span.Hours % 12;
+            if (hours == 0) hours = 12;
+            
+            return $"{hours}:{span.Minutes:D2} {amPm}";
+        }
     }
     
-    /*
     [
         TerminalCommand("spectate"),
         CommandInfo("Leave your team and start spectating the game.")
     ]
-    string SpectateCommand() {
-        Player.Local.StartSpectating();
-        return "You are now spectating.";
+    void SpectateCommand() {
+        TerminalUtil.Instance.QuitTerminal();
+        Player.Local.StartSpectatingServerRpc();
     }
-    */
 
     [
         TerminalCommand("join", clearText: true),

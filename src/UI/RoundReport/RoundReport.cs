@@ -7,7 +7,6 @@ using UnityEngine;
 namespace CompetitiveCompany.UI;
 
 internal class RoundReport : MonoBehaviour {
-    [SerializeField] float _showDuration;
     [SerializeField] float _autoScrollDuration;
     [SerializeField] RectTransform _autoScrollBar;
     [SerializeField] GameObject _panel;
@@ -19,7 +18,6 @@ internal class RoundReport : MonoBehaviour {
 
     Tab? _selectedTab;
     Coroutine? _autoScrollCoroutine;
-    Coroutine? _waitThenHideCoroutine;
 
     const float Scale = 0.4f;
 
@@ -58,22 +56,15 @@ internal class RoundReport : MonoBehaviour {
         
         SwitchTab(_tabs[0]);
         
-        _autoScrollCoroutine = StartCoroutine(AutoScroll());
-        _waitThenHideCoroutine = StartCoroutine(WaitThenHide());
-
         if (Plugin.Config.ShowMouseOnRoundReport.Value) {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             Player.Local.Controller.quickMenuManager.isMenuOpen = true;
+        } else {
+            _autoScrollCoroutine = StartCoroutine(AutoScroll());
         }
         
         _panel.SetActive(true);
-        return;
-
-        IEnumerator WaitThenHide() {
-            yield return new WaitForSeconds(_showDuration);
-            Hide();
-        }
     }
 
     public void Hide() {
@@ -86,7 +77,6 @@ internal class RoundReport : MonoBehaviour {
         _panel.DisableObject();
         
         StopCoroutineIfNotNull(ref _autoScrollCoroutine);
-        StopCoroutineIfNotNull(ref _waitThenHideCoroutine);
     }
     
     void OnTabButtonClicked(TabButton tabButton) {
@@ -121,7 +111,7 @@ internal class RoundReport : MonoBehaviour {
     IEnumerator AutoScroll() {
         _autoScrollBar.gameObject.SetActive(true);
         
-        for (var i = 1; i <= 2; i++) {
+        for (var i = 1; i <= 3; i++) {
             var t = 0f;
             
             _autoScrollBar.anchorMax = Vector2.zero;
@@ -132,11 +122,13 @@ internal class RoundReport : MonoBehaviour {
                 yield return null;
                 t += Time.deltaTime;
             }
-            
-            SwitchTab(_tabs[i]);
+
+            if (i == 3) {
+                Hide();
+            } else {
+                SwitchTab(_tabs[i]);
+            }
         }
-        
-        _autoScrollBar.gameObject.SetActive(false);
     }
 
     void StopCoroutineIfNotNull(ref Coroutine? coroutine) {

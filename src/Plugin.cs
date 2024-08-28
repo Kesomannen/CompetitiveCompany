@@ -65,6 +65,7 @@ public class Plugin : BaseUnityPlugin {
         MiscPatches.Patch();
         Team.Patch();
         Session.Patch();
+        LeverPatches.Patch();
         
         Log.Debug("Running InitializeOnLoad methods...");
         RunInitializeOnLoadMethods();
@@ -87,7 +88,6 @@ public class Plugin : BaseUnityPlugin {
         var validator = new NetcodeValidator(Guid);
         validator.BindToPreExistingObjectByBehaviour<Player, PlayerControllerB>();
 
-        /*
         Session.OnSessionStarted += _ => {
             SpectatorController.Spawn();
         };
@@ -98,7 +98,6 @@ public class Plugin : BaseUnityPlugin {
                 Destroy(spectatorController.gameObject);
             }
         };
-        */
         
         Log.Info($"Plugin loaded in {stopwatch.ElapsedMilliseconds}ms");
     }

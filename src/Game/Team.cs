@@ -282,6 +282,27 @@ public class Team : NetworkBehaviour, ITeam {
     public void SetNameServerRpc(FixedString128Bytes newName) {
         RawName = newName;
     }
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void StartLeavingServerRpc() {
+        if (TimeUtil.GetCurrentGameTime().TotalHours < _session.Settings.MinLeaveTime) {
+            Log.Debug($"{RawName}: Too early to leave!");
+            return;
+        }
+        
+        
+        /*
+        foreach (var member in Members) {
+            member.IsSpectating = true;
+        }
+        */
+        
+        var timeOfDay = TimeOfDay.Instance;
+        var timeToLeave = _session.Settings.TimeToLeave / timeOfDay.numberOfHours;
+        var leaveTime = timeOfDay.normalizedTimeOfDay + timeToLeave;
+        
+        TimeOfDay.Instance.SetShipLeaveEarlyClientRpc(leaveTime, 1);
+    }
 
     [ServerRpc(RequireOwnership = false)]
     void BuyItemsServerRpc(int[] boughtItems, int newCredits, int numItemsInShip) {

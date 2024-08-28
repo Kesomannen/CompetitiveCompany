@@ -39,14 +39,15 @@ internal class MatchEndScreen : MonoBehaviour {
         Session.Current.OnMatchEnded += OnMatchEnded;
     }
 
+    #if DEBUG
     void Update() {
-        return;
         if (_cameraContainer.gameObject.activeInHierarchy) return;
         
         if (Keyboard.current.gKey.wasPressedThisFrame) {
             OnMatchEnded(new MatchEndedContext(Player.Local.Team!));
         }
     }
+    #endif
 
     void OnDestroy() {
         Session.Current.OnMatchEnded -= OnMatchEnded;
