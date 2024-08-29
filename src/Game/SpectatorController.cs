@@ -12,6 +12,7 @@
 //    The above copyright notice and this permission notice shall be included in all
 //    copies or substantial portions of the Software.
 
+using CompetitiveCompany.Game;
 using GameNetcodeStuff;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -146,6 +147,7 @@ internal class SpectatorController : MonoBehaviour {
              Down : [{_(vanillaKeybinds["Crouch"])}]
              Toggle Light : [{_(keybinds.SpectatorToggleLight)}]
              Teleport to Player : [0-{StartOfRound.Instance.connectedPlayersAmount - 1}]
+             Exit Spectator Mode : [{_(keybinds.ExitSpectator)}]
              """,
             clearAllOther: true
         );
@@ -199,15 +201,8 @@ internal class SpectatorController : MonoBehaviour {
         _localPlayer.SetSpectatedPlayerEffects();
     }
 
-    /**
-     * Changes the visibility of the controls on the HUD
-     */
-    void ToggleControls(InputAction.CallbackContext context) {
-        //Only do it if performing
-        if (!context.performed) {
-            return;
-        }
 
+    void ToggleControls(InputAction.CallbackContext context) {
         //Don't do things if paused
         if (_localPlayer.isTypingChat || _localPlayer.quickMenuManager.isMenuOpen) {
             return;
@@ -217,17 +212,33 @@ internal class SpectatorController : MonoBehaviour {
         _controlsHidden = !_controlsHidden;
         UpdateControlText();
     }
+    
+    void ExitSpectator(InputAction.CallbackContext context) {
+        //Don't do things if paused
+        if (_localPlayer.isTypingChat || _localPlayer.quickMenuManager.isMenuOpen) {
+            return;
+        }
+
+        if (Player.Local.Team != null) {
+            HUDManager.Instance.DisplayTip("Can't Exit", "Currently not allowed to leave spectator!", true);
+            return;
+        }
+
+        Player.Local.StopSpectatingServerRpc();
+    }
 
     void OnEnable() {
         var keybinds = Plugin.Config.Keybinds;
         keybinds.SpectatorToggleLight.performed += ToggleLight;
         keybinds.ToggleSpectatorControls.performed += ToggleControls;
+        keybinds.ExitSpectator.performed += ExitSpectator;
     }
 
     void OnDisable() {
         var keybinds = Plugin.Config.Keybinds;
         keybinds.SpectatorToggleLight.performed -= ToggleLight;
         keybinds.ToggleSpectatorControls.performed -= ToggleControls;
+        keybinds.ExitSpectator.performed -= ExitSpectator;
     }
 
     /**

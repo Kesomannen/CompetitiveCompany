@@ -98,7 +98,7 @@ public class Plugin : BaseUnityPlugin {
                 Destroy(spectatorController.gameObject);
             }
         };
-        
+
         Log.Info($"Plugin loaded in {stopwatch.ElapsedMilliseconds}ms");
     }
 

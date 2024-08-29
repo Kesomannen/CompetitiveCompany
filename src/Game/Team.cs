@@ -290,12 +290,9 @@ public class Team : NetworkBehaviour, ITeam {
             return;
         }
         
-        
-        /*
         foreach (var member in Members) {
             member.IsSpectating = true;
         }
-        */
         
         var timeOfDay = TimeOfDay.Instance;
         var timeToLeave = _session.Settings.TimeToLeave / timeOfDay.numberOfHours;

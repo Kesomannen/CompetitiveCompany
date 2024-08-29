@@ -17,7 +17,7 @@ It features a new game mode, where teams of players compete to collect the most 
 
 ## Recommended Mods
 
-This mod is intentionally designed to be somewhat minimal. To improve your experience, consider also using any/all of the following mods. These are required by everyone in the lobby unless stated otherwise.
+This mod is designed to be somewhat minimal. To improve your experience, consider also using the following mods. These are required by everyone in the lobby unless stated otherwise.
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) lets you have up to 32 players in a lobby and customize your player's appearance with cosmetics.
 - [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/) adds an in-game menu for configuring mods, including this one. Does not need to be installed by everyone.
@@ -74,9 +74,6 @@ Additionally you can define a custom set of default teams that will be created e
 
 ## Planned Features
 
-- [ ] Controlled lever pulling
-  - Make it so once a team pulls the lever, the ship leaves within a configurable time frame instead of immediately. The team who pulls will go into spectator mode while the others have to scramble to get on the ship.
-- [ ] Spectator role
 - [ ] Saving & loading
 - [ ] Controlled moon selection
   - Make it so only one team can select the next moon to go to. This will be configurable to either be the losers pick or cycle through the teams.

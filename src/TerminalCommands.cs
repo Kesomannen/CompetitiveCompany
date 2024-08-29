@@ -59,7 +59,6 @@ internal class TerminalCommands {
         CommandInfo("Leave your team and start spectating the game.")
     ]
     void SpectateCommand() {
-        TerminalUtil.Instance.QuitTerminal();
         Player.Local.StartSpectatingServerRpc();
     }
 

@@ -17,5 +17,8 @@ public class Keybinds : LcInputActions {
     [InputAction(KeyboardControl.F, Name = "Toggle spectator light")]
     public InputAction SpectatorToggleLight { get; private set; }
     
+    [InputAction(KeyboardControl.Backspace, Name = "Exit spectator mode")]
+    public InputAction ExitSpectator { get; private set; }
+    
     # nullable restore
 }
