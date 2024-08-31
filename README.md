@@ -1,4 +1,4 @@
-﻿# Competitive Company
+# Competitive Company
 
 _In an effort to combat the declining performance of its employees, the Company is introducing a form of in-house training. This new initiative pits coworkers against each other in a scrap-collecting competition across the galaxy. By the end of a few days, the lucky winner will be awarded a continued contract with the Company and a **brand new** group of coworkers!_
 
@@ -45,9 +45,9 @@ This information can also be found in-game by running the `other` command.
 
 ## Configuration
 
-Most configuration is done via a normal `.cfg` file. Every option except those in the `Client` section are server-side and can only be set by the host. The options take effect immediately, meaning you can configure match settings on the fly with a mod like [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/).
+Most configuration is done via a normal `.cfg` file. All options except those in the `Client` section are server-side and can only be set by the host. The options take effect immediately, meaning you can configure match settings on the fly with a mod like [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/).
 
-Additionally you can define a custom set of default teams that will be created each time you start a lobby. This is done via a `default_teams.json` file in the config folder. Any players you specify will be put into that team after joining. For example:
+Additionally, you can define a custom set of default teams that will be created each time you start a lobby. This is done via a `default_teams.json` file in the config folder. Any players you specify will be put into that team after joining. For example:
 ```json
 [
   {
@@ -74,6 +74,7 @@ Additionally you can define a custom set of default teams that will be created e
 
 ## Planned Features
 
+- [ ] Spectator role
 - [ ] Saving & loading
 - [ ] Controlled moon selection
   - Make it so only one team can select the next moon to go to. This will be configurable to either be the losers pick or cycle through the teams.
@@ -84,7 +85,7 @@ Additionally you can define a custom set of default teams that will be created e
 
 This mod exposes an API for other mods to interact with.
 
-1. Download the mod from Thunderstore.
+1. Download the mod from [Thunderstore](https://thunderstore.io/c/lethal-company/p/Kesomannen/CompetitiveCompany/).
 2. Copy the `CompetitiveCompany.dll` and `CompetitiveCompany.xml` files to a folder in your project, for example `lib`.
 3. Add the following to your .csproj file:
 
@@ -99,16 +100,16 @@ This mod exposes an API for other mods to interact with.
 ```csharp
 [BepInDependency(CompetitiveCompany.Plugin.Guid)]
 public class MyPlugin : BaseUnityPlugin {
-    ...
+    //...
 }
 ```
 
-Here's a couple of quick examples:
+You should now be able to access the public members under the `CompetitiveCompany` namespace. Here's a couple of quick examples:
 
 ```csharp
 using CompetitiveCompany.Game;
 
-// item that shows the position of all enemies when activated
+// Item that shows the position of all enemies when activated
 public class XRayItem : GrabbableObject {
     public override void ItemActivate(bool used, bool buttonDown = true) {
         if (!used) return;
@@ -132,15 +133,15 @@ public class XRayItem : GrabbableObject {
 ```csharp
 using CompetitiveCompany.Game;
 
-// only allow combat inside of the facility
+// Only allow PvP inside of the facility
 [BepInPlugin(...)]
 public class Plugin : BaseUnityPlugin {
     void Awake() {
         Session.OnSessionStarted += OnSessionStarted;
     }
 
-    void OnSessionStarted() {
-        Session.Current.Combat.AddPredicate((attacker, victim) => {
+    void OnSessionStarted(Session session) {
+        session.Combat.AddPredicate((attacker, victim) => {
             if (!attacker.Controller.isInsideFactory) {
                 return DamagePredicateResult.Deny("PvP is only allowed inside the facility");
             }
@@ -151,7 +152,7 @@ public class Plugin : BaseUnityPlugin {
 }
 ```
 
-## Contributing
+## Building
 
 Make sure you have the following installed:
 
@@ -170,7 +171,6 @@ Make sure you have the following installed:
 
    - [LethalAPI.Terminal](https://thunderstore.io/c/lethal-company/p/LethalAPI/LethalAPI_Terminal/)
    - [LethalCompanyInputUtils](https://thunderstore.io/c/lethal-company/p/Rune580/LethalCompany_InputUtils/)
-   - [LethalLib](https://thunderstore.io/c/lethal-company/p/Evaisa/LethalLib/)
    - [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/)
    - [Runtime_Netcode_Patcher](https://thunderstore.io/c/lethal-company/p/Ozone/Runtime_Netcode_Patcher/)
 
@@ -180,7 +180,15 @@ Make sure you have the following installed:
    ```sh
    dotnet build
    ```
-   The mod will be built to `bin/Debug/netstandard2.1/CompetitiveCompany.dll`.
+   The mod will be built to `bin/Debug/netstandard2.1/CompetitiveCompany.dll`. Alternatively do a release build with
+   ```sh
+    dotnet build -c Release
+    ```
+   which will create a thunderstore-ready zip file in the `build` folder.
 
 > [!IMPORTANT]
-> Don't forget to include the asset bundle and FlowTween.dll in the same folder as the mod's DLL before running the game. The unity project to build the asset bundle is not included in the repository (yet).
+> When testing locally, don't forget to include `assets/competitive-company` and `lib/FlowTween.dll` in the same folder as the mod's DLL.
+ 
+> The unity project to build the asset bundle is not yet included in this repository.
+
+> The source code of FlowTween can be found [here](https://github.com/Kesomannen/FlowTween). The FlowTween.dll in this project is a slightly modified version with the editor scripts taken out.

@@ -82,7 +82,7 @@ public class Team : NetworkBehaviour, ITeam {
     /// The name of the team. To set this, use <see cref="RawName"/>.
     /// </summary>
     /// <remarks>
-    /// This creates a new string from <see cref="RawName"/> each time it's accessed,
+    /// This clones <see cref="RawName"/> each time it's accessed,
     /// so only use this if you specifically need a <c>string</c>.
     /// </remarks>
     public string Name => _name.Value.ToString();
@@ -127,11 +127,7 @@ public class Team : NetworkBehaviour, ITeam {
     /// </summary>
     public int Credits {
         get => _credits.Value;
-        set {
-            Log.Debug($"{RawName}: Setting credits to {value}");
-            
-            _credits.Value = value;
-        } 
+        set => _credits.Value = value;
     }
     
     /// <summary>
@@ -290,15 +286,17 @@ public class Team : NetworkBehaviour, ITeam {
             return;
         }
         
+        /*
         foreach (var member in Members) {
             member.IsSpectating = true;
         }
+        */
         
         var timeOfDay = TimeOfDay.Instance;
         var timeToLeave = _session.Settings.TimeToLeave / timeOfDay.numberOfHours;
         var leaveTime = timeOfDay.normalizedTimeOfDay + timeToLeave;
         
-        TimeOfDay.Instance.SetShipLeaveEarlyClientRpc(leaveTime, 1);
+        TimeOfDay.Instance.SetShipLeaveEarlyClientRpc(leaveTime, 0);
     }
 
     [ServerRpc(RequireOwnership = false)]

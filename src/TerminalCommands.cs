@@ -54,6 +54,7 @@ internal class TerminalCommands {
         }
     }
     
+    /*
     [
         TerminalCommand("spectate"),
         CommandInfo("Leave your team and start spectating the game.")
@@ -61,6 +62,7 @@ internal class TerminalCommands {
     void SpectateCommand() {
         Player.Local.StartSpectatingServerRpc();
     }
+    */
 
     [
         TerminalCommand("join", clearText: true),

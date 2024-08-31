@@ -92,17 +92,17 @@ public class Player : NetworkBehaviour {
     Session _session = null!;
     
     /// <summary>
-    /// The name of the player, including useful debug information.
+    /// The name of the player with some attached debug information.
     /// </summary>
     /// <example>
-    /// <c>Kesomannen [Loot bugs] (Host + Local)</c>
+    /// <c>Kesomannen [Loot bugs] (Host, Local)</c>
     /// </example>
     public string DebugName {
         get {
             var team = Team?.Name ?? "None";
             var title = OwnedByHost ? "Host" : "Client";
             if (IsOwner) {
-                title += " + Local";
+                title += ", Local";
             }
 
             return $"{Name} [{team}] ({title})";
@@ -139,11 +139,13 @@ public class Player : NetworkBehaviour {
         Controller = GetComponent<PlayerControllerB>();
     }
 
+#if DEBUG
     void Update() {
         if (Keyboard.current.iKey.wasPressedThisFrame) {
-            _isSpectating.Value = !_isSpectating.Value;
+            StartSpectatingServerRpc();
         }
     }
+#endif
 
     /// <inheritdoc />
     public override void OnGainedOwnership() {

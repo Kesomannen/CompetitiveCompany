@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CompetitiveCompany.Util;
 using GameNetcodeStuff;
 using Unity.Collections;
 using Unity.Netcode;
@@ -223,10 +222,10 @@ public class Session : NetworkBehaviour {
         IsRoundActive = true;
 
         if (!IsMatchActive) {
-            OnMatchStarted?.Invoke(new MatchStartedContext());
+            OnMatchStarted?.Invoke(new MatchStartedContext(this));
         }
         
-        OnRoundStarted?.Invoke(new RoundStartedContext(RoundNumber));
+        OnRoundStarted?.Invoke(new RoundStartedContext(this, RoundNumber));
         Log.Info($"Round {RoundNumber + 1} started");
     }
     
@@ -241,7 +240,7 @@ public class Session : NetworkBehaviour {
         IsRoundActive = false;
         
         var wasLastRound = RoundNumber >= Settings.NumberOfRounds - 1;
-        OnRoundEnded?.Invoke(new RoundEndedContext(wasLastRound, RoundNumber));
+        OnRoundEnded?.Invoke(new RoundEndedContext(this, wasLastRound, RoundNumber));
         
         // round starts with 0
         if (wasLastRound) {
@@ -251,7 +250,7 @@ public class Session : NetworkBehaviour {
 
     void EndMatch() {
         Log.Info("Match ended");
-        OnMatchEnded?.Invoke(new MatchEndedContext(Teams.GetLeader(TeamMetric.TotalScore)));
+        OnMatchEnded?.Invoke(new MatchEndedContext(this, Teams.GetLeader(TeamMetric.TotalScore)));
 
         if (!IsServer) return;
         
@@ -408,10 +407,10 @@ public class Session : NetworkBehaviour {
 
             var result = Current.Combat.CanDamage(attacker, victim);
             
-            #if DEBUG
+#if DEBUG
             var resultStr = result.Result ? "Allowed" : $"Denied: {result.Reason}";
             Log.Debug($"{attacker} tried to damage {victim}: {resultStr}");
-            #endif
+#endif
             
             if (result.Result) {
                 orig(self, amount, direction, playerWhoHit);
@@ -419,35 +418,5 @@ public class Session : NetworkBehaviour {
                 HUDManager.Instance.DisplayTip("PvP is not allowed!", result.Reason, isWarning: true);
             }
         };
-    }
-}
-
-public readonly struct RoundStartedContext {
-    public readonly int RoundNumber;
-
-    internal RoundStartedContext(int roundNumber) {
-        RoundNumber = roundNumber;
-    }
-}
-
-public readonly struct RoundEndedContext {
-    public readonly bool WasLastRound;
-    public readonly int RoundNumber;
-    
-    internal RoundEndedContext(bool wasLastRound, int roundNumber) {
-        WasLastRound = wasLastRound;
-        RoundNumber = roundNumber;
-    }
-}
-
-public readonly struct MatchStartedContext {
-    
-}
-
-public readonly  struct MatchEndedContext {
-    public readonly Team WinningTeam;
-    
-    internal MatchEndedContext(Team winningTeam) {
-        WinningTeam = winningTeam;
     }
 }

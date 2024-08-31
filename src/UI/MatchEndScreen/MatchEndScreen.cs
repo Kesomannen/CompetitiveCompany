@@ -38,16 +38,16 @@ internal class MatchEndScreen : MonoBehaviour {
         
         Session.Current.OnMatchEnded += OnMatchEnded;
     }
-
-    #if DEBUG
+    
+#if DEBUG
     void Update() {
         if (_cameraContainer.gameObject.activeInHierarchy) return;
         
         if (Keyboard.current.gKey.wasPressedThisFrame) {
-            OnMatchEnded(new MatchEndedContext(Player.Local.Team!));
+            OnMatchEnded(new MatchEndedContext(Session.Current, Player.Local.Team!));
         }
     }
-    #endif
+#endif
 
     void OnDestroy() {
         Session.Current.OnMatchEnded -= OnMatchEnded;
@@ -76,7 +76,7 @@ internal class MatchEndScreen : MonoBehaviour {
             var (position, rotation) = CalculatePlayerPosition(i, members.Count);
             var newModel = Instantiate(model, position, rotation);
             
-            // enable all the LOD renderers
+            // enable all the renderers
             foreach (Transform child in newModel) {
                 child.gameObject.SetActive(true);
                 if (!child.TryGetComponent(out SkinnedMeshRenderer renderer)) continue;
