@@ -242,7 +242,8 @@ public class Team : NetworkBehaviour, ITeam {
     }
     
     void OnNameChangedHandler(FixedString128Bytes _, FixedString128Bytes current) {
-           Suit.unlockableName = $"{current} Suit";
+        Suit.unlockableName = $"{current} Suit";
+        name = $"CompetitiveCompanyTeam_{current}";
         OnNameChanged?.Invoke(in current);
     }
     
@@ -251,7 +252,7 @@ public class Team : NetworkBehaviour, ITeam {
     }
 
     /// <summary>
-    /// Deletes the team. Fails if the team has members.
+    /// Deletes the team. Fails if the team has any members.
     /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void DeleteServerRpc() {
@@ -296,14 +297,14 @@ public class Team : NetworkBehaviour, ITeam {
         var timeToLeave = _session.Settings.TimeToLeave / timeOfDay.numberOfHours;
         var leaveTime = timeOfDay.normalizedTimeOfDay + timeToLeave;
         
+        Log.Debug($"{RawName}: Leaving at {leaveTime} ({TimeUtil.NormalizedToGameTime(leaveTime)})");
+        
         TimeOfDay.Instance.SetShipLeaveEarlyClientRpc(leaveTime, 0);
     }
 
     [ServerRpc(RequireOwnership = false)]
     void BuyItemsServerRpc(int[] boughtItems, int newCredits, int numItemsInShip) {
-        #if DEBUG
         Log.Debug($"{RawName}: Syncing bought items to clients. New credits: {newCredits}, items in ship: {numItemsInShip}");
-        #endif
         
         Credits = newCredits;
         TerminalUtil.Instance.orderedItemsFromTerminal.AddRange(boughtItems);
@@ -312,9 +313,7 @@ public class Team : NetworkBehaviour, ITeam {
     
     [ClientRpc]
     void SyncItemsInShipClientRpc(int itemsInShip) {
-        #if DEBUG
         Log.Debug($"Received items in ship from server: {itemsInShip}");
-        #endif
         
         TerminalUtil.Instance.numberOfItemsInDropship = itemsInShip;
     }

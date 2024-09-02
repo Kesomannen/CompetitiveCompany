@@ -24,10 +24,6 @@ internal static class MiscPatches {
                 "TEAM CREDITS: N/A" :
                 $"TEAM CREDITS: ${localTeam.Credits}";
         };
-
-        On.StartOfRound.FirePlayersAfterDeadlineClientRpc += (_, _, _, _) => {
-            // don't
-        };
     }
 
     static TerminalNode? _refuseCompanyMoonNode;

@@ -10,6 +10,7 @@ using HarmonyLib;
 using RuntimeNetcodeRPCValidator;
 using UnityEngine;
 using static BepInEx.BepInDependency.DependencyFlags;
+using Debug = UnityEngine.Debug;
 
 namespace CompetitiveCompany;
 
@@ -99,6 +100,10 @@ public class Plugin : BaseUnityPlugin {
             }
         };
 
+#if DEBUG
+        Debug.unityLogger.logEnabled = false;
+#endif
+        
         Log.Info($"Plugin loaded in {stopwatch.ElapsedMilliseconds}ms");
     }
 

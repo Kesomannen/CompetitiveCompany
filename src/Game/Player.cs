@@ -41,6 +41,14 @@ public class Player : NetworkBehaviour {
             team = null;
             return false;
         }
+
+        public override string ToString() {
+            if (!HasValue) {
+                return "[NONE]";
+            }
+            
+            return Ref.TryGet(out var behaviour) ? behaviour.ToString() : "[INVALID]";
+        }
     }
     
     readonly NetworkVariable<bool> _isSpectating = new();
@@ -139,30 +147,13 @@ public class Player : NetworkBehaviour {
         Controller = GetComponent<PlayerControllerB>();
     }
 
-#if DEBUG
-    void Update() {
-        if (Keyboard.current.iKey.wasPressedThisFrame) {
-            StartSpectatingServerRpc();
-        }
-    }
-#endif
-
     /// <inheritdoc />
     public override void OnGainedOwnership() {
         base.OnGainedOwnership();
         
-        StartCoroutine(Routine());
-        return;
-
-        IEnumerator Routine() {
-            // for some reason ownership isn't actually being transferred until a few frames later
-            yield return null;
-            yield return null;
-            
-            var setting = Plugin.Config.EndOfMatchEmote;
-            _endOfMatchEmote.Value = (int)setting.Value;
-            setting.SettingChanged += OnEndOfMatchEmoteChanged;
-        }
+        var setting = Plugin.Config.EndOfMatchEmote;
+        //_endOfMatchEmote.Value = (int)setting.Value;
+        setting.SettingChanged += OnEndOfMatchEmoteChanged;
     }
 
     /// <inheritdoc />
@@ -178,12 +169,21 @@ public class Player : NetworkBehaviour {
         _session.Players.Register(this);
         
         _teamReference.OnValueChanged += OnTeamReferenceChanged;
-
-        if (_teamReference.Value.TryGet(out var team)) {
-            JoinTeam(team);
-        }
-
         _isSpectating.OnValueChanged += OnIsSpectatingChanged;
+        
+        StartCoroutine(Routine());
+        return;
+
+        IEnumerator Routine() {
+            yield return null;
+            
+            if (_teamReference.Value.TryGet(out var team)) {
+                PlayerLog($"Player already has a team: {team.Name}", LogLevel.Debug); 
+                JoinTeam(team);
+            } else {
+                PlayerLog("Player doesn't have a team", LogLevel.Debug);
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -200,6 +200,8 @@ public class Player : NetworkBehaviour {
     }
 
     void OnTeamReferenceChanged(TeamRef previous, TeamRef current) {
+        PlayerLog($"Team reference changed: {previous} -> {current}", LogLevel.Debug);
+        
         if (previous.TryGet(out var prevTeam)) {
             LeaveTeam(prevTeam);
         }

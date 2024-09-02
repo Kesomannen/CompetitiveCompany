@@ -39,6 +39,9 @@ public struct NetworkedSettings(Config config) : INetworkSerializable {
         serializer.SerializeValue(ref FriendlyFire);
         serializer.SerializeValue(ref NumberOfRounds);
         serializer.SerializeValue(ref ShipSafeRadius);
+        serializer.SerializeValue(ref DisableAutoPilot);
+        serializer.SerializeValue(ref MinLeaveTime);
+        serializer.SerializeValue(ref TimeToLeave);
         
         serializer.SerializeValue(ref JoinTeamPerm);
         serializer.SerializeValue(ref CreateAndDeleteTeamPerm);

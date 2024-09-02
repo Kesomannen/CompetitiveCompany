@@ -44,11 +44,11 @@ internal class RoundReport : MonoBehaviour {
     }
 
     void OnRoundEnded(RoundEndedContext ctx) {
-        if (ctx.WasLastRound) return;
-        
         if (!Application.isEditor) {
             GetVanillaElement().gameObject.SetActive(false);
         }
+        
+        if (ctx.WasLastRound) return;
         
         _roundResultsPage.Populate();
         _standingsPage.Populate();

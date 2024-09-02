@@ -23,6 +23,7 @@ internal static class LeverPatches {
             c.EmitDelegate<Action<StartMatchLever>>(self => {
                 var canLeave = TimeUtil.GetCurrentGameTime().TotalHours >= Session.Current.Settings.MinLeaveTime;
                 self.triggerScript.hoverTip = canLeave ? "Start ship : [LMB]" : "[Too early to start ship]";
+                self.triggerScript.interactable = canLeave;
             });
         };
 

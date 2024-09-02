@@ -123,6 +123,11 @@ public class Session : NetworkBehaviour {
         }
     }
 
+    void Update() {
+        TimeOfDay.Instance.timeUntilDeadline = float.MaxValue;
+        TimeOfDay.Instance.daysUntilDeadline = int.MaxValue;
+    }
+
     /// <inheritdoc />
     public override void OnNetworkSpawn() {
         Log.Message("Session started");
@@ -139,7 +144,7 @@ public class Session : NetworkBehaviour {
         if (IsClient) {
             _settings.OnValueChanged += OnSettingsChanged;
         }
-
+        
         OnSessionStarted?.Invoke(this);
     }
 
@@ -226,7 +231,7 @@ public class Session : NetworkBehaviour {
         }
         
         OnRoundStarted?.Invoke(new RoundStartedContext(this, RoundNumber));
-        Log.Info($"Round {RoundNumber + 1} started");
+        Log.Info($"Round {RoundNumber} started");
     }
     
     void EndRound() {
