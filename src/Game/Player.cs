@@ -33,11 +33,17 @@ public class Player : NetworkBehaviour {
         }
         
         public bool TryGet([NotNullWhen(true)] out Team? team) {
-            if (HasValue && Ref.TryGet(out var behaviour) && behaviour is Team result) {
+            if (!HasValue) {
+                team = null;
+                return false;
+            }
+            
+            if (Ref.TryGet(out var behaviour) && behaviour is Team result) {
                 team = result;
                 return true;
             }
 
+            Log.Warning("Invalid team reference");
             team = null;
             return false;
         }
@@ -45,7 +51,7 @@ public class Player : NetworkBehaviour {
         public override string ToString() {
             if (!HasValue) {
                 return "[NONE]";
-            }
+            }   
             
             return Ref.TryGet(out var behaviour) ? behaviour.ToString() : "[INVALID]";
         }
@@ -171,17 +177,14 @@ public class Player : NetworkBehaviour {
         _teamReference.OnValueChanged += OnTeamReferenceChanged;
         _isSpectating.OnValueChanged += OnIsSpectatingChanged;
         
-        StartCoroutine(Routine());
+        StartCoroutine(InitializeNextFrame());
         return;
 
-        IEnumerator Routine() {
-            yield return null;
+        IEnumerator InitializeNextFrame() {
+            yield return null; // wait for teams to get spawned
             
             if (_teamReference.Value.TryGet(out var team)) {
-                PlayerLog($"Player already has a team: {team.Name}", LogLevel.Debug); 
                 JoinTeam(team);
-            } else {
-                PlayerLog("Player doesn't have a team", LogLevel.Debug);
             }
         }
     }
@@ -200,8 +203,6 @@ public class Player : NetworkBehaviour {
     }
 
     void OnTeamReferenceChanged(TeamRef previous, TeamRef current) {
-        PlayerLog($"Team reference changed: {previous} -> {current}", LogLevel.Debug);
-        
         if (previous.TryGet(out var prevTeam)) {
             LeaveTeam(prevTeam);
         }
@@ -215,13 +216,12 @@ public class Player : NetworkBehaviour {
     
     void JoinTeam(Team team) {
         team.OnColorChanged += OnTeamColorChanged;
-        OnTeamColorChanged(team.Color);
-        
         team.OnNameChanged += OnTeamNameChanged;
-        OnTeamNameChanged(team.Name);
         
         Team = team;
         team.MembersInternal.Add(this);
+        
+        RefreshUsernameText();
 
         var forceSuits = _session.Settings.ForceSuits;
         if (forceSuits || _session.Teams.TryGetFromSuit(Controller.currentSuitID, out _)) {
@@ -235,6 +235,7 @@ public class Player : NetworkBehaviour {
             OnTeamCreditsChanged(team.Credits);
             
             if (!forceSuits) {
+                // make sure the old team's suit is hidden and the new one is
                 _session.RefreshSuits();
             }
         }
@@ -249,12 +250,7 @@ public class Player : NetworkBehaviour {
     public void WearTeamSuit() {
         if (Team == null) return;
         
-        Controller.currentSuitID = Team.SuitId;
-        
-        Controller.thisPlayerModel.material = Team.SuitMaterial;
-        Controller.thisPlayerModelLOD1.material = Team.SuitMaterial;
-        Controller.thisPlayerModelLOD2.material = Team.SuitMaterial;
-        Controller.thisPlayerModelArms.material = Team.SuitMaterial;
+        UnlockableSuit.SwitchSuitForPlayer(Controller, Team.SuitId, playAudio: false);
     }
 
     void LeaveTeam(Team team) {
@@ -270,12 +266,17 @@ public class Player : NetworkBehaviour {
         PlayerLog($"Left team {team.Name}", LogLevel.Debug);
     }
     
+    void RefreshUsernameText() {
+        Controller.usernameBillboardText.color = Team?.Color ?? Color.white;
+        Controller.usernameBillboardText.text = Team == null ? Name : $"{Name} ({Team.RawName})";
+    }
+    
     void OnTeamColorChanged(Color color) {
-        Controller.usernameBillboardText.color = color;
+        RefreshUsernameText();
     }
     
     void OnTeamNameChanged(in FixedString128Bytes newValue) {
-        Controller.usernameBillboardText.text = $"({newValue}) {Name}";
+        RefreshUsernameText();
     }
 
     static void OnTeamCreditsChanged(int credits) {
@@ -376,6 +377,12 @@ public class Player : NetworkBehaviour {
 
             if (!self.IsServer) return;
             self.GetComponent<Player>().SetItemInElevator(item, inShip);
+        };
+
+        On.GameNetcodeStuff.PlayerControllerB.SendNewPlayerValuesClientRpc += (orig, self, playerIds) => {
+            orig(self, playerIds);
+            
+            self.GetComponent<Player>().RefreshUsernameText();
         };
 
         IL.GameNetcodeStuff.PlayerControllerB.SetItemInElevator += il => {

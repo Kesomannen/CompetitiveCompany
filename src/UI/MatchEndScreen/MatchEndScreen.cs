@@ -131,6 +131,9 @@ internal class MatchEndScreen : MonoBehaviour {
 
     void Hide() {
         foreach (var (light, state) in _lightStates) {
+            if (light == null) {
+                continue;
+            }
             light.gameObject.SetActive(state);
         }
 

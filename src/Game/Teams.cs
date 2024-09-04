@@ -67,25 +67,28 @@ public class Teams : IReadOnlyList<Team> {
     /// </summary>
     /// <example>
     /// <code lang="plaintext">
-    /// * ============================================ *
-    /// | Team      | Round Score    | Total Score     |
-    /// * -------------------------------------------- *
-    /// | Team 1    | 100            | 1000            |
-    /// | Team 2    | 200            | 2000            |
-    /// | Team 3    | 300            | 3000            |
-    /// * ============================================ *
+    /// * ================================================ *
+    /// | Team          | Round Score    | Total Score     |
+    /// * ------------------------------------------------ *
+    /// | Team 1 (2)    | 100            | 1000            |
+    /// | Team 2 (1)    | 200            | 2000            |
+    /// | Team 3 (1)    | 300            | 3000            |
+    /// * ================================================ *
     /// </code>
     /// </example>
     public IEnumerable<string> PrettyPrint(int width, bool color) {
         var teamNames = _list.Select(team => {
-            var length = team.RawName.Length;
+            var membersSuffix = $" ({team.Members.Count})";
+            
+            var length = team.RawName.Length + membersSuffix.Length;
             var name = color ? team.ColoredName : team.Name;
+            name += membersSuffix;
 
             if (Player.Local.Team == team) {
                 name = "> " + name;
                 length += 2;
             }
-
+            
             return (Name: name, DisplayedLength: length);
         }).ToArray();
         

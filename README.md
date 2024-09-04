@@ -7,7 +7,7 @@ _Sign up now to secure your future with the Company!_
 ---
 
 This mod is a rewrite and continuation of [Competitive Company by agmas](https://thunderstore.io/c/lethal-company/p/agmas/CompetitiveCompany/).
-It features a new game mode, where teams of players compete to collect the most amount of scrap within a set number of days. Credits are automatically added as you collect scrap and there's no quota to worry about.
+It features a new game mode, where teams of players compete to collect the most amount of scrap within a set number of days.
 
 > [!IMPORTANT]
 > All players in the lobby are required to have the mod installed!
@@ -15,13 +15,27 @@ It features a new game mode, where teams of players compete to collect the most 
 > [!NOTE]
 > The gamemode cannot be toggled off; i.e. to play the base game you have to disable the whole mod.
 
+<details>
+<summary><b>Detailed description of features</b></summary>
+
+- Players are divided into teams, each with their own name, color and credits. Teams are managed through terminal commands (see below).
+- By default, the suit rack is disabled and players instead wear suits according their teams' color.
+- The quota system is removed, instead a match always ends after 3 days. The team who has collected the most scrap during this time wins.
+- Credits are automatically added to your team as you collect scrap. Any scrap that has been brought into the ship cannot be "cashed out" again.
+- The vanilla round report is replaced with a new one which, in addition to the usual stats, shows the current standings of all teams.
+- After the last round of a match, the winning team is shown in a special end-of-game cutscene.
+- You cannot start the ship before 3 PM has passed. Once you pull the lever, there's also 3-hour grace period before the ship actually takes off. Additionally, the spectator autopilot vote is disabled.
+- PvP is forbidden inside- and in a small area around the ship, as well as between teammates.
+
+_The numbers shown here are just default values and can be freely configured by the host._
+</details>
+
 ## Recommended Mods
 
-This mod is designed to be somewhat minimal. To improve your experience, consider also using the following mods. These are required by everyone in the lobby unless stated otherwise.
+This mod is designed to be somewhat minimal. To complement your experience, consider also using the following mods. These are required by everyone in the lobby unless stated otherwise.
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) lets you have up to 32 players in a lobby and customize your player's appearance with cosmetics.
 - [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/) adds an in-game menu for configuring mods, including this one. Does not need to be installed by everyone.
-- [LethalCompanyVariables](https://thunderstore.io/c/lethal-company/p/AMRV/LethalCompanyVariables/) adds a ton of configuration options, including increasing the amount of scrap and monsters in the game to suit larger lobbies. Depending on your settings, this may not need to be installed by everyone.
 - [BetterEmotes](https://thunderstore.io/c/lethal-company/p/KlutzyBubbles/BetterEmotes/) adds more emotes to the game, which can be used in the end of match cutscene (see the Client config section).
 - Custom moons with [LethalLevelLoader](https://thunderstore.io/c/lethal-company/p/IAmBatby/LethalLevelLoader/). Vanilla moons can prove too small and linear for this gamemode, especially with a large number of players. Here are some recommended mods made by the community:
   - TODO
@@ -41,7 +55,7 @@ Teams are managed through custom terminal commands:
 | `settings`               | View the current match settings.                                                                                                                              |
 | `scramble-teams`         | Randomly assigns players to teams. Only the host can use this.                                                                                                |
 
-This information can also be found in-game by running the `other` command.
+_This information can also be found in-game by running the `other` command._
 
 ## Configuration
 

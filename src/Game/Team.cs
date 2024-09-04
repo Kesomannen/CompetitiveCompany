@@ -73,6 +73,8 @@ public class Team : NetworkBehaviour, ITeam {
     readonly NetworkVariable<int> _roundScore = new();
     readonly NetworkVariable<int> _totalScore = new();
     readonly NetworkVariable<int> _credits = new();
+    
+    readonly NetworkVariable<int> _suitId = new();
 
     internal string[]? MembersFromDefinition;
     
@@ -85,7 +87,7 @@ public class Team : NetworkBehaviour, ITeam {
     /// This clones <see cref="RawName"/> each time it's accessed,
     /// so only use this if you specifically need a <c>string</c>.
     /// </remarks>
-    public string Name => _name.Value.ToString();
+    public string Name => RawName.ToString();
 
     /// <summary>
     /// The name of the team. Can only be set on the server.
@@ -129,16 +131,19 @@ public class Team : NetworkBehaviour, ITeam {
         get => _credits.Value;
         set => _credits.Value = value;
     }
-    
+
     /// <summary>
     /// The unlockables ID of the team's suit.
     /// </summary>
-    public int SuitId { get; private set; }
+    public int SuitId {
+        get => _suitId.Value;
+        private set => _suitId.Value = value;
+    }
 
     /// <summary>
     /// The unlockable item of the team's suit.
     /// </summary>
-    public UnlockableItem Suit { get; private set; } = null!;
+    public UnlockableItem SuitUnlockable { get; private set; } = null!;
     
     /// <summary>
     /// The material of the team's suit. Automatically updates when the color changes.
@@ -183,20 +188,28 @@ public class Team : NetworkBehaviour, ITeam {
 
     void CreateSuit() {
         var startOfRound = StartOfRound.Instance;
-        Suit = SuitHelper.CreateSuit("Team Suit", startOfRound);
-        Suit.alreadyUnlocked = true;
+        SuitUnlockable = SuitUtil.CreateSuit("Team Suit", startOfRound);
+        SuitUnlockable.alreadyUnlocked = true;
 
         SuitMaterial = Instantiate(Assets.TeamSuitMaterial);
         
         // copy the original textures
-        SuitMaterial.mainTexture = Suit.suitMaterial.mainTexture;
-        SuitMaterial.SetTexture(_normalMapID, Suit.suitMaterial.GetTexture(_normalMapID));
+        SuitMaterial.mainTexture = SuitUnlockable.suitMaterial.mainTexture;
+        SuitMaterial.SetTexture(_normalMapID, SuitUnlockable.suitMaterial.GetTexture(_normalMapID));
         
-        Suit.suitMaterial = SuitMaterial;
+        SuitUnlockable.suitMaterial = SuitMaterial;
         
+        // make sure the suit ID is the same on all clients
         var unlockables = startOfRound.unlockablesList.unlockables;
-        SuitId = unlockables.Count;
-        unlockables.Add(Suit);
+        if (IsServer) {
+            unlockables.Add(SuitUnlockable);
+            SuitId = unlockables.Count;
+        } else {
+            while (unlockables.Count <= SuitId) {
+                unlockables.Add(null);
+            }
+            unlockables[SuitId] = SuitUnlockable;
+        }
         
         OnColorChangedHandler(default, Color);
         OnNameChangedHandler(default, RawName);
@@ -236,13 +249,15 @@ public class Team : NetworkBehaviour, ITeam {
     void OnColorChangedHandler(Color previous, Color current) {
         if (SuitMaterial != null) {
             SuitMaterial.color = current;
+            Log.Debug($"Setting color for {RawName} to {current}");
         }
         
         OnColorChanged?.Invoke(current);
     }
     
     void OnNameChangedHandler(FixedString128Bytes _, FixedString128Bytes current) {
-        Suit.unlockableName = $"{current} Suit";
+        SuitUnlockable.unlockableName = $"{current} Suit";
+        SuitMaterial.name = $"{current} Suit Material";
         name = $"CompetitiveCompanyTeam_{current}";
         OnNameChanged?.Invoke(in current);
     }

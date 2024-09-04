@@ -23,7 +23,8 @@ namespace CompetitiveCompany;
     BepInDependency("com.rune580.LethalCompanyInputUtils"),
     BepInDependency("NicholaScott.BepInEx.RuntimeNetcodeRPCValidator"),
     BepInDependency("ainavt.lc.lethalconfig", SoftDependency),
-    BepInDependency("BetterEmotes", SoftDependency)
+    BepInDependency("BetterEmotes", SoftDependency),
+    BepInIncompatibility("ShaosilGaming.GeneralImprovements")
 ]
 [BepInPlugin(Guid, Name, Version)]
 public class Plugin : BaseUnityPlugin {
@@ -48,7 +49,7 @@ public class Plugin : BaseUnityPlugin {
     /// <summary>
     /// The maximum number of teams allowed in a session.
     /// </summary>
-    public const int MaxTeams = 6;
+    public const int MaxTeams = 8;
 
     void Awake() {
         var stopwatch = Stopwatch.StartNew();
@@ -99,10 +100,6 @@ public class Plugin : BaseUnityPlugin {
                 Destroy(spectatorController.gameObject);
             }
         };
-
-#if DEBUG
-        Debug.unityLogger.logEnabled = false;
-#endif
         
         Log.Info($"Plugin loaded in {stopwatch.ElapsedMilliseconds}ms");
     }

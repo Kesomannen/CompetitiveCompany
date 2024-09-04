@@ -82,7 +82,7 @@ public class Config(ConfigFile file) {
     public ConfigEntry<float> MinLeaveTime { get; } = file.Bind(
         "General",
         "MinimumLeaveTime",
-        11f,
+        15f,
         new ConfigDescription(
             "The earliest in-game time a player can pull the lever to starting leaving the current moon." +
             "Specified in hours on a 24-hour clock (the ship arrives at 8 and leaves at 24).",
@@ -96,7 +96,7 @@ public class Config(ConfigFile file) {
     public ConfigEntry<float> TimeToLeave { get; } = file.Bind(
         "General",
         "TimeToLeave",
-        1f,
+        3f,
         new ConfigDescription(
             "How many in-game hours it takes for the ship to leave after the lever is pulled.",
             new AcceptableValueRange<float>(0f, 16f)

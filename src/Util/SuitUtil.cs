@@ -1,6 +1,6 @@
 ﻿namespace CompetitiveCompany;
 
-internal static class SuitHelper {
+internal static class SuitUtil {
     public static UnlockableItem GetOriginalSuit(StartOfRound playerManager) {
         return playerManager.unlockablesList.unlockables.Find(item => item.suitMaterial != null && item.alreadyUnlocked);
     }

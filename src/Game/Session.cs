@@ -202,7 +202,7 @@ public class Session : NetworkBehaviour {
         
         // check if player is already assigned to a team, otherwise pick the smallest one
         var team = Teams.FirstOrDefault(team => 
-            team.MembersFromDefinition != null && 
+            team.MembersFromDefinition != null &&
             team.MembersFromDefinition.Any(n => n.Equals(
                 player.Name,
                 StringComparison.OrdinalIgnoreCase
