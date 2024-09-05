@@ -4,7 +4,12 @@
 
 ### Added
 
-- Member counts to the `list-teams` command
+- Member counts to the `teams` command
+
+### Changed
+
+- Renamed the `list-teams` command to `teams`
+- Recompile for version 62.0.1
 
 ### Fixed
 

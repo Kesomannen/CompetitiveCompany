@@ -34,7 +34,7 @@ public class Plugin : BaseUnityPlugin {
     public const string Guid = "com.kesomannen.competitivecompany";
     
     const string Name = "CompetitiveCompany";
-    const string Version = "0.1.0";
+    const string Version = "0.2.0";
     
     /// <summary>
     /// Main instance of <see cref="CompetitiveCompany.Config"/>.

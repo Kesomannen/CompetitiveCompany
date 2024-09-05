@@ -1,12 +1,12 @@
 ﻿namespace CompetitiveCompany;
 
 internal static class SuitUtil {
-    public static UnlockableItem GetOriginalSuit(StartOfRound playerManager) {
-        return playerManager.unlockablesList.unlockables.Find(item => item.suitMaterial != null && item.alreadyUnlocked);
+    public static UnlockableItem GetOriginalSuit() {
+        return StartOfRound.Instance.unlockablesList.unlockables.Find(item => item.suitMaterial != null && item.alreadyUnlocked);
     }
 
-    public static UnlockableItem CreateSuit(string name, StartOfRound playerManager) {
-        var original = GetOriginalSuit(playerManager);
+    public static UnlockableItem CreateSuit(string name) {
+        var original = GetOriginalSuit();
         
         return new UnlockableItem {
             unlockableName = name,

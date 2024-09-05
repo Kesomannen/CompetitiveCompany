@@ -45,9 +45,9 @@ This mod is designed to be somewhat minimal. To complement your experience, cons
 Teams are managed through custom terminal commands:
 
 | Command                  | Description                                                                                                                                                   |
-| ------------------------ |---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `join <team> [player]`   | Join a team. The host can join other players by specifying their username as the last argument.                                                               |
-| `list-teams`             | Lists all teams and their scores.                                                                                                                             |
+| `teams`                  | Lists all teams and their scores.                                                                                                                             |
 | `create-team <name>`     | Creates a new team with the given name. By default, only the host can use this.                                                                               |
 | `delete-team <team>`     | Deletes the specified team. By default, only the host can use this.                                                                                           |
 | `set-team-name <name>`   | Changes the name of your current team. The max length for team names is 64 characters.                                                                        |

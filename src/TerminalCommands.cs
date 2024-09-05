@@ -130,14 +130,14 @@ internal class TerminalCommands {
             
             if (player.Team == team) {
                 return player.IsOwner ? 
-                    $"You are already in team {team.Name}!" :
-                    $"Player {playerName} is already in team {team.Name}!";
+                    $"You are already in team {team.ColoredName}!" :
+                    $"Player {playerName} is already in team {team.ColoredName}!";
             }
             
             player.SetTeamFromServer(team);
             return player.IsOwner ? 
-                $"Joined team {team.Name}." :
-                $"Moved {playerName} to team {team.RawName}";
+                $"Joined team {team.ColoredName}." :
+                $"Moved {playerName} to team {team.ColoredName}";
         }
 
         string Client() {
@@ -147,11 +147,11 @@ internal class TerminalCommands {
 
             var player = Player.Local;
             if (player.Team == team) {
-                return $"You are already in team {team.Name}!";
+                return $"You are already in team {team.ColoredName}!";
             }
             
             player.SetTeamServerRpc(team);
-            return $"Joined team {team.RawName}.";
+            return $"Joined team {team.ColoredName}.";
         }
     }
     
@@ -187,7 +187,7 @@ internal class TerminalCommands {
 
     [
         TerminalCommand("create-team", clearText: true),
-        CommandInfo("Create a new team", "<name>")
+        CommandInfo("Create a new team with a name and random color.", "<name>")
     ]
     string CreateTeam([RemainingText] string teamName) {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
@@ -212,7 +212,7 @@ internal class TerminalCommands {
 
     [
         TerminalCommand("delete-team", clearText: true),
-        CommandInfo("Delete a team", "<team>")
+        CommandInfo("Delete an empty team.", "<team>")
     ]
     string DeleteTeam([RemainingText] string teamName) {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
@@ -235,8 +235,8 @@ internal class TerminalCommands {
     }
 
     [
-        TerminalCommand("list-teams", clearText: true),
-        CommandInfo("Lists all teams")
+        TerminalCommand("teams", clearText: true),
+        CommandInfo("Lists all teams and their scores.")
     ]
     string ListTeams() {
         return string.Join('\n', Session.Current.Teams.PrettyPrint(51, color: true));
@@ -244,7 +244,7 @@ internal class TerminalCommands {
 
     [
         TerminalCommand("set-team-color", clearText: true),
-        CommandInfo("Set the color of your current team", "<color>")
+        CommandInfo("Set the color of your current team.", "<color>")
     ]
     string ColorCommand([RemainingText] string input) {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;
@@ -269,7 +269,7 @@ internal class TerminalCommands {
 
     [
         TerminalCommand("set-team-name", clearText: true),
-        CommandInfo("Renames your current team", "<name>")
+        CommandInfo("Rename your current team.", "<name>")
     ]
     string RenameCommand([RemainingText] string name) {
         if (Session.Current.IsRoundActive) return AlreadyPlayingMessage;

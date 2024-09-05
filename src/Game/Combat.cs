@@ -7,7 +7,7 @@ namespace CompetitiveCompany.Game;
 /// The main method is <see cref="CanDamage"/>, which checks <see cref="Predicates"/> in order,
 /// returning the first <see cref="DamagePredicateResult"/> that denies the damage,
 /// or <see cref="DamagePredicateResult.Allow"/> if none do.
-/// The most used instance of this class is the one stored in <see cref="Session.Combat"/>,
+/// The most used instance of this class is the one in <see cref="Session"/>,
 /// which is evaluated each time a player tries to damage another player.
 /// </summary>
 public class Combat {
@@ -39,7 +39,7 @@ public class Combat {
 
     /// <summary>
     /// Creates a new instance of <see cref="Combat"/> with no predicates,
-    /// making it allow all damage by default.
+    /// meaning it will allow all damage by default.
     /// </summary>
     public Combat() {
         _predicates = [];
@@ -57,7 +57,11 @@ public class Combat {
     /// If <paramref name="index"/> is negative, the predicate is added to the end of the list.
     /// </summary>
     public void AddPredicate(DamagePredicate predicate, int index = -1) {
-        _predicates.Insert(index < 0 ? _predicates.Count : index, predicate);
+        if (index < 0) {
+            _predicates.Add(predicate);
+        } else {
+            _predicates.Insert(index, predicate);
+        }
     }
     
     /// <summary>
@@ -115,5 +119,8 @@ public readonly struct DamagePredicateResult {
     /// </summary>
     public static DamagePredicateResult Deny(string reason) => new(false, reason);
     
+    /// <summary>
+    /// Implicitly converts a <see cref="DamagePredicateResult"/> to a <see cref="bool"/> (alias for <see cref="Result"/>).
+    /// </summary>
     public static implicit operator bool(DamagePredicateResult predicateResult) => predicateResult.Result;
 }

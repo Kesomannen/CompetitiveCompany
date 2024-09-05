@@ -7,7 +7,7 @@
         <AssemblyName>CompetitiveCompany</AssemblyName>
         <ProjectGuid>com.kesomannen.competitivecompany</ProjectGuid>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Version>0.1.1</Version>
+        <Version>0.2.0</Version>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -21,7 +21,7 @@
         <PackageReference Include="BepInEx.Core" Version="5.*" />
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" />
         <PackageReference Include="Evaisa.LethalLib" Version="0.16.1" />
-        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="61.0.0-ngd.0" />
+        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="62.0.1-ngd.0" />
         <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" />
     </ItemGroup>
     
@@ -40,14 +40,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="build\" />
+      <Folder Include="build/" />
     </ItemGroup>
 
-    <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
+    <Target Name="RunNetcodePatcher" AfterTargets="PostBuildEvent">
         <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')" />
     </Target>
     
-    <Target Name="BuildThunderstorePackage" AfterTargets="NetcodePatch" Condition="'$(Configuration)' == 'Release'">
+    <Target Name="BuildThunderstorePackage" AfterTargets="RunNetcodePatcher" Condition="'$(Configuration)' == 'Release'">
         <Exec Command="tcli build --package-version $(Version)" />
     </Target>
             

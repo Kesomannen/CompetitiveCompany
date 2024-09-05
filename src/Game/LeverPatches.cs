@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CompetitiveCompany.Util;
 using MonoMod.Cil;
 
@@ -42,13 +43,8 @@ internal static class LeverPatches {
         };
 
         On.StartMatchLever.EndGame += (orig, self) => {
-            if (Session.Current.Settings.TimeToLeave <= 0) {
-                orig(self); // vanilla behaviour
-                return;
-            }
-
             var startOfRound = StartOfRound.Instance;
-
+            
             if (
                 !Player.Local.Controller.isPlayerDead &&
                 !startOfRound.shipHasLanded ||
@@ -58,8 +54,18 @@ internal static class LeverPatches {
                 return;
             }
             
+            var session = Session.Current;
+            
+            if (session.Settings.TimeToLeave <= 0 || session.Teams.GetLiving().Count() == 1) {
+                orig(self); // vanilla behaviour
+                return;
+            }
+            
             var localTeam = Player.Local.Team;
-            if (localTeam == null) return;
+            if (localTeam == null) {
+                Log.Warning("Player without a team pulled the lever!");
+                return;
+            }
             
             localTeam.StartLeavingServerRpc();
         };

@@ -143,12 +143,12 @@ public class Team : NetworkBehaviour, ITeam {
     /// <summary>
     /// The unlockable item of the team's suit.
     /// </summary>
-    public UnlockableItem SuitUnlockable { get; private set; } = null!;
-    
+    public UnlockableItem SuitUnlockable => StartOfRound.Instance.unlockablesList.unlockables[SuitId];
+
     /// <summary>
     /// The material of the team's suit. Automatically updates when the color changes.
     /// </summary>
-    public Material SuitMaterial { get; private set; } = null!;
+    public Material SuitMaterial => SuitUnlockable.suitMaterial;
     
     /// <summary>
     /// The members of the team. To add or remove players from teams, see <see cref="Player.SetTeamServerRpc"/>.
@@ -159,7 +159,7 @@ public class Team : NetworkBehaviour, ITeam {
     /// Returns the name of the team that, when shown by a TextMeshPro component, will be colored
     /// according to the team's color.
     /// </summary>
-    public string ColoredName => $"<color=#{ColorUtility.ToHtmlStringRGB(Color)}>{RawName}</color>";
+    public string ColoredName => ApplyColor(RawName);
 
     Session _session = null!;
     
@@ -187,32 +187,34 @@ public class Team : NetworkBehaviour, ITeam {
     public delegate void NameChangedHandler(in FixedString128Bytes name);
 
     void CreateSuit() {
-        var startOfRound = StartOfRound.Instance;
-        SuitUnlockable = SuitUtil.CreateSuit("Team Suit", startOfRound);
-        SuitUnlockable.alreadyUnlocked = true;
+        var unlockable = SuitUtil.CreateSuit($"{RawName} Team Suit");
+        unlockable.alreadyUnlocked = true;
 
-        SuitMaterial = Instantiate(Assets.TeamSuitMaterial);
+        var material = Instantiate(Assets.TeamSuitMaterial);
         
         // copy the original textures
-        SuitMaterial.mainTexture = SuitUnlockable.suitMaterial.mainTexture;
-        SuitMaterial.SetTexture(_normalMapID, SuitUnlockable.suitMaterial.GetTexture(_normalMapID));
+        material.mainTexture = unlockable.suitMaterial.mainTexture;
+        material.SetTexture(_normalMapID, unlockable.suitMaterial.GetTexture(_normalMapID));
         
-        SuitUnlockable.suitMaterial = SuitMaterial;
+        material.name = $"{RawName} Suit Material";
+        material.color = Color;
+        
+        unlockable.suitMaterial = material;
         
         // make sure the suit ID is the same on all clients
-        var unlockables = startOfRound.unlockablesList.unlockables;
+        var unlockables = StartOfRound.Instance.unlockablesList.unlockables;
         if (IsServer) {
-            unlockables.Add(SuitUnlockable);
-            SuitId = unlockables.Count;
+            unlockables.Add(unlockable);
+            SuitId = unlockables.Count - 1;
         } else {
             while (unlockables.Count <= SuitId) {
                 unlockables.Add(null);
             }
-            unlockables[SuitId] = SuitUnlockable;
+            unlockables[SuitId] = unlockable;
         }
         
-        OnColorChangedHandler(default, Color);
-        OnNameChangedHandler(default, RawName);
+        
+        Log.Debug($"Created suit for {RawName} with ID {SuitId}");
     }
     
     /// <summary>
@@ -247,16 +249,12 @@ public class Team : NetworkBehaviour, ITeam {
     }
     
     void OnColorChangedHandler(Color previous, Color current) {
-        if (SuitMaterial != null) {
-            SuitMaterial.color = current;
-            Log.Debug($"Setting color for {RawName} to {current}");
-        }
-        
+        SuitMaterial.color = current;
         OnColorChanged?.Invoke(current);
     }
     
     void OnNameChangedHandler(FixedString128Bytes _, FixedString128Bytes current) {
-        SuitUnlockable.unlockableName = $"{current} Suit";
+        SuitUnlockable.unlockableName = $"{current} Team Suit";
         SuitMaterial.name = $"{current} Suit Material";
         name = $"CompetitiveCompanyTeam_{current}";
         OnNameChanged?.Invoke(in current);
@@ -315,6 +313,14 @@ public class Team : NetworkBehaviour, ITeam {
         Log.Debug($"{RawName}: Leaving at {leaveTime} ({TimeUtil.NormalizedToGameTime(leaveTime)})");
         
         TimeOfDay.Instance.SetShipLeaveEarlyClientRpc(leaveTime, 0);
+    }
+
+    /// <summary>
+    /// Wraps the string representation of <paramref name="content"/>
+    /// with a TMP rich text tag corresponding to the team's color.
+    /// </summary>
+    public string ApplyColor(object content) {
+        return $"<color=#{ColorUtility.ToHtmlStringRGB(Color)}>{content}</color>";
     }
 
     [ServerRpc(RequireOwnership = false)]

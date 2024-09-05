@@ -10,10 +10,10 @@ using UnityEngine;
 namespace CompetitiveCompany.Game;
 
 /// <summary>
-/// The main class which manages the teams, players and flow of a match.
-/// You can use <c>Session.Current</c> to access the current session.
+/// The main class which manages the teams, players and state of a session.
 /// Session lives as long as <c>StartOfRound</c>, from the user joining a lobby to them leaving it.
 /// During a session, there may be any number of matches, each with a number of rounds.
+/// You can use <c>Session.Current</c> to access the current session.
 /// </summary>
 public class Session : NetworkBehaviour {
     readonly NetworkVariable<NetworkedSettings> _settings = new();
@@ -50,21 +50,24 @@ public class Session : NetworkBehaviour {
     public NetworkedSettings Settings => _settings.Value;
 
     /// <summary>
-    /// List of all teams in the session. <see cref="Teams"/> implements <see cref="IReadOnlyList{Team}"/>,
-    /// so you can use it like any other list, except it's immutable.
+    /// List of all teams in the session. Since <see cref="Teams"/> implements <see cref="IReadOnlyList{Team}"/>
+    /// you can use it like any other list, except it's immutable.
     /// </summary>
     public Teams Teams { get; } = new();
 
     /// <summary>
-    /// List of the players in the session. <see cref="Players"/> implements <see cref="IReadOnlyList{Player}"/>,
-    /// so you can use it like any other list, except that it's immutable.
+    /// List of the players in the session. Since <see cref="Players"/> implements <see cref="IReadOnlyList{Player}"/>
+    /// you can use it like any other list, except that it's immutable.
     /// </summary>
     public Players Players { get; } = new();
 
+    /// <summary>
+    /// The combat instance used to control PvP combat.
+    /// </summary>
     public Combat Combat { get; private set; } = null!;
 
     // only server side!!
-    internal HashSet<ulong> CollectedItemIds { get; } = [];
+    internal HashSet<ulong> CollectedItemIds = [];
 
     /// <summary>
     /// Invoked right after a round has started, which happens when all
@@ -227,6 +230,7 @@ public class Session : NetworkBehaviour {
         IsRoundActive = true;
 
         if (!IsMatchActive) {
+            CollectedItemIds = [];
             OnMatchStarted?.Invoke(new MatchStartedContext(this));
         }
         
@@ -287,8 +291,14 @@ public class Session : NetworkBehaviour {
                 player.WearTeamSuit();
             }
         } else {
+            var localTeam = Player.Local.Team;
             foreach (var suit in suits) {
-                suit.gameObject.SetActive(true);
+                // hide suits from other teams
+                if (Teams.TryGetFromSuit(suit.suitID, out var team)) {
+                    suit.gameObject.SetActive(team == localTeam);
+                } else {
+                    suit.gameObject.SetActive(true);
+                }
             }
             StartOfRound.Instance.PositionSuitsOnRack();
         }

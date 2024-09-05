@@ -169,6 +169,14 @@ public class Teams : IReadOnlyList<Team> {
         return _list.OrderByDescending(team => team.GetScore(metric)).First();
     }
 
+    /// <summary>
+    /// Returns an enumerable of all teams that have at least one living player.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<Team> GetLiving() {
+        return _list.Where(team => team.Members.Any(player => !player.Controller.isPlayerDead));
+    }
+
     internal void Register(Team team) {
         _list.Add(team);
         _suits[team.SuitId] = team;

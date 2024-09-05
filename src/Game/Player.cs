@@ -249,8 +249,7 @@ public class Player : NetworkBehaviour {
     /// </summary>
     public void WearTeamSuit() {
         if (Team == null) return;
-        
-        UnlockableSuit.SwitchSuitForPlayer(Controller, Team.SuitId, playAudio: false);
+        UnlockableSuit.SwitchSuitForPlayer(Controller, Team.SuitId, playAudio: false); 
     }
 
     void LeaveTeam(Team team) {
@@ -263,7 +262,7 @@ public class Player : NetworkBehaviour {
             team.OnCreditsChanged -= OnTeamCreditsChanged;
         }
         
-        PlayerLog($"Left team {team.Name}", LogLevel.Debug);
+        PlayerLog($"Left team {team.RawName}", LogLevel.Debug);
     }
     
     void RefreshUsernameText() {
