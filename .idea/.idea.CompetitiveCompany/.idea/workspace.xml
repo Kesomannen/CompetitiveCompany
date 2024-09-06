@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="07965ea7-b367-461e-9ee4-50e8cf50de02" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/thunderstore.toml" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/thunderstore.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/src/Game/LeverPatches.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/LeverPatches.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Session.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Session.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Team.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Team.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Teams.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Teams.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +77,7 @@
       <updated>1725600013069</updated>
       <workItem from="1725600017003" duration="142000" />
       <workItem from="1725600178716" duration="601000" />
-      <workItem from="1725601042192" duration="1273000" />
+      <workItem from="1725601042192" duration="2835000" />
     </task>
     <servers />
   </component>

@@ -56,8 +56,15 @@ internal static class LeverPatches {
             
             var session = Session.Current;
             
-            if (session.Settings.TimeToLeave <= 0 || session.Teams.GetLiving().Count() == 1) {
+            if (session.Settings.TimeToLeave <= 0) {
+                Log.Info("TimeToLeave is 0, starting ship immediately.");
                 orig(self); // vanilla behaviour
+                return;
+            }
+
+            if (session.Teams.GetLiving().Count() == 1) {
+                Log.Info("Only one team left, starting ship immediately.");
+                orig(self);
                 return;
             }
             

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2024-09-06
 
 ### Added
 
@@ -13,10 +13,10 @@
 
 ### Fixed
 
-- Hopefully all issues regarding team names, colors and members de-syncing between clients
-- Added GeneralImprovements as a hard incompatibility
+- Hopefully fixed issues related team names, colors and members de-syncing between clients
+- Added GeneralImprovements as an incompatibility
 - The end-of-game cutscene not showing up
-- Clients being able to use the autopilot while the host could not
+- Clients being able to use the autopilot while the host can't
 - The ship lever being interactable earlier in the day than it should
 - Rejoining a game causing the camera to be stuck in an endless void
 - Playing more than three days causing a soft-lock

@@ -76,7 +76,7 @@ public class Team : NetworkBehaviour, ITeam {
     
     readonly NetworkVariable<int> _suitId = new();
 
-    internal string[]? MembersFromDefinition;
+    internal string[]? AssignedPlayers;
     
     internal readonly List<Player> MembersInternal = [];
 
@@ -296,7 +296,7 @@ public class Team : NetworkBehaviour, ITeam {
     [ServerRpc(RequireOwnership = false)]
     public void StartLeavingServerRpc() {
         if (TimeUtil.GetCurrentGameTime().TotalHours < _session.Settings.MinLeaveTime) {
-            Log.Debug($"{RawName}: Too early to leave!");
+            Log.Warning($"{RawName}: Too early to leave!");
             return;
         }
         
@@ -310,7 +310,7 @@ public class Team : NetworkBehaviour, ITeam {
         var timeToLeave = _session.Settings.TimeToLeave / timeOfDay.numberOfHours;
         var leaveTime = timeOfDay.normalizedTimeOfDay + timeToLeave;
         
-        Log.Debug($"{RawName}: Leaving at {leaveTime} ({TimeUtil.NormalizedToGameTime(leaveTime)})");
+        Log.Info($"{RawName}: Leaving at {leaveTime:F2} ({TimeUtil.NormalizedToGameTime(leaveTime)})");
         
         TimeOfDay.Instance.SetShipLeaveEarlyClientRpc(leaveTime, 0);
     }

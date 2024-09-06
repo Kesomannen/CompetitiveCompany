@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace CompetitiveCompany.Game;
 
@@ -19,14 +20,20 @@ public class Teams : IReadOnlyList<Team> {
     public int Count => _list.Count;
     
     /// <summary>
-    /// Returns the team with the fewest members.
+    /// Chooses randomly from the teams with the fewest members.
     /// </summary>
     public Team GetSmallest() {
         if (Count == 0) {
             throw new InvalidOperationException("No teams to choose from");
         }
         
-        return _list.OrderBy(team => team.Members.Count).First();
+        var available = _list
+            .GroupBy(team => team.Members.Count)
+            .OrderBy(group => group.Key)
+            .First()
+            .ToArray();
+        
+        return available[Random.Range(0, available.Length)];
     }
     
     /// <summary>

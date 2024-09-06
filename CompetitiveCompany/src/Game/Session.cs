@@ -182,7 +182,7 @@ public class Session : NetworkBehaviour {
             Log.Error($"Team {def.Name} was not created!");
             return;
         }
-        team.MembersFromDefinition = def.Players;
+        team.AssignedPlayers = def.Players;
     }
     
     /// <summary>
@@ -205,8 +205,8 @@ public class Session : NetworkBehaviour {
         
         // check if player is already assigned to a team, otherwise pick the smallest one
         var team = Teams.FirstOrDefault(team => 
-            team.MembersFromDefinition != null &&
-            team.MembersFromDefinition.Any(n => n.Equals(
+            team.AssignedPlayers != null &&
+            team.AssignedPlayers.Any(n => n.Equals(
                 player.Name,
                 StringComparison.OrdinalIgnoreCase
             ))
