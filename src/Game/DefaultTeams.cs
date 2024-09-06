@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CompetitiveCompany.Game;
 
 /// <summary>
-/// Handles the default teams, which can be overridden by a JSON file.
+/// Handles the default teams that are created when a lobby is started.
 /// </summary>
 public static class DefaultTeams {
     static readonly TeamDefinition[] _fallback = [
@@ -26,7 +26,7 @@ public static class DefaultTeams {
     /// <summary>
     /// Gets the default teams, either from a user-made JSON file or <see cref="Fallback"/>.
     /// </summary>
-    public static TeamDefinition[] Get() {
+    public static IReadOnlyList<TeamDefinition> Get() {
         var path = Path.Join(BepInEx.Paths.ConfigPath, FileName);
         Log.Debug($"Looking for {FileName} at {path}.");
         if (!File.Exists(path)) {
@@ -44,7 +44,7 @@ public static class DefaultTeams {
                 _ => teams
             };
         } catch (Exception e) {
-            Log.Warning($"Failed to read {FileName}: {e.Message}, using fallback.");
+            Log.Error($"Failed to read {FileName}: {e.Message}, using fallback.");
             return _fallback;
         }
     }
@@ -83,7 +83,7 @@ public class TeamDefinition {
     /// <summary>
     /// Creates a new team definition, where the color is provided as a hex string or one of <see cref="ColorUtil.ColorNames"/>.
     /// This is primarily for JSON deserialization, if you want to create a <see cref="TeamDefinition"/> through code,
-    /// use the typed constructor instead.
+    /// prefer to use the typed constructor instead.
     /// </summary>
     [JsonConstructor]
     public TeamDefinition(string name, string color, string[]? players = null) {
