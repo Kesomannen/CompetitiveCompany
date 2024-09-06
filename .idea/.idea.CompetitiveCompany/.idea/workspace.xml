@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="07965ea7-b367-461e-9ee4-50e8cf50de02" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/CompetitiveCompany/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany.sln" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/competitive-company" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/icon.psd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/FlowTween.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/lib/FlowTween.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Assets.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Assets.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Compat/LethalConfigCompat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Compat/LethalConfigCompat.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Compat/SoftDependencyHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Compat/SoftDependencyHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Config.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Config.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/ChatPatches.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/ChatPatches.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Combat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Combat.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/DefaultTeams.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/DefaultTeams.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Events/MatchEndedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/MatchEndedContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Events/MatchStartedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/MatchStartedContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Events/RoundEndedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/RoundEndedContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Events/RoundStartedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/RoundStartedContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/LeverPatches.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/LeverPatches.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/MiscPatches.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/MiscPatches.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Player.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Players.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Players.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Session.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Session.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/SpectatorController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/SpectatorController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Team.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Team.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game/Teams.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Teams.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Keybinds.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Keybinds.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Log.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Log.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NetworkPrefabs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/NetworkPrefabs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NetworkedSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/NetworkedSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Plugin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Plugin.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TerminalCommands.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/TerminalCommands.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/MatchEndScreen/MatchEndScreen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/MatchEndScreen/MatchEndScreen.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/MockTeam.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/MockTeam.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/RoundReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/RoundReport.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/RoundResultsPage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/RoundResultsPage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/StandingsPage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/StandingsPage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TabButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TabButton.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamPerformanceMember.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamPerformanceMember.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamPerformancePage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamPerformancePage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamResultsPage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamResultsPage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamRoundResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamRoundResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Util/ColorUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/ColorUtil.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Util/Emote.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/Emote.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Util/SuitUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/SuitUtil.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Util/TerminalUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/TerminalUtil.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Util/TimeUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/TimeUtil.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/thunderstore.toml" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="Toolset" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2lgS1TCXdlqH8sB4iyqmqNyuJhC" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\bobbo\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\bobbo\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\bobbo\\AppData\\Local\\Symbols\\src&quot;
+    ]
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="07965ea7-b367-461e-9ee4-50e8cf50de02" name="Changes" comment="" />
+      <created>1725600013069</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1725600013069</updated>
+      <workItem from="1725600017003" duration="142000" />
+      <workItem from="1725600178716" duration="601000" />
+      <workItem from="1725601042192" duration="949000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityProjectDiscoverer">
+    <option name="hasUnityReference" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>

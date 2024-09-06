@@ -1,9 +1,4 @@
-bin/
-obj/
-build/
-lib/*
-*.user
-!lib/FlowTween.dll
+**/*.user
 /packages/
 riderModule.iml
 /_ReSharper.Caches/

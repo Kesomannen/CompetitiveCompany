@@ -4,7 +4,7 @@ repository = "https://thunderstore.io"
 [package]
 name = "CompetitiveCompany"
 namespace = "Kesomannen"
-description = "Adds a new team-based PvP scrap-collecting gamemode to the game"
+description = "Adds a new team-based PvP scrap-collecting gamemode"
 websiteUrl = "https://github.com/Kesomannen/CompetitiveCompany"
 
 [package.dependencies]
@@ -20,11 +20,11 @@ Evaisa-HookGenPatcher = "0.0.5"
 icon = "assets/icon.png"
 
 [[build.copy]]
-source = "CHANGELOG.md"
+source = "./../CHANGELOG.md"
 target = "CHANGELOG.md"
 
 [[build.copy]]
-source = "LICENSE.md"
+source = "./../LICENSE.md"
 target = "LICENSE.md"
 
 [[build.copy]]

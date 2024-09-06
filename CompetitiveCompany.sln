@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompetitiveCompany", "CompetitiveCompany.csproj", "{C7D7D9AA-D880-4B33-8F43-E3593E2B49CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompetitiveCompany", "./CompetitiveCompany/CompetitiveCompany.csproj", "{C7D7D9AA-D880-4B33-8F43-E3593E2B49CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
