@@ -167,7 +167,7 @@ public class Session : NetworkBehaviour {
 
     /// <summary>
     /// Creates a team from the given <see cref="TeamDefinition"/>.
-    /// This can only be called on the server.
+    /// Can only be called on the server.
     /// </summary>
     public void CreateTeamFromDefinition(TeamDefinition def) {
         if (!IsServer) {
@@ -179,7 +179,7 @@ public class Session : NetworkBehaviour {
         
         var team = Teams.Get(def.Name);
         if (team == null) {
-            Log.Error($"BUG! Team {def.Name} was not created!");
+            Log.Error($"Team {def.Name} was not created!");
             return;
         }
         team.MembersFromDefinition = def.Players;
@@ -230,7 +230,6 @@ public class Session : NetworkBehaviour {
         IsRoundActive = true;
 
         if (!IsMatchActive) {
-            CollectedItemIds = [];
             OnMatchStarted?.Invoke(new MatchStartedContext(this));
         }
         

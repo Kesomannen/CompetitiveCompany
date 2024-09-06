@@ -5,57 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="07965ea7-b367-461e-9ee4-50e8cf50de02" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompetitiveCompany/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CompetitiveCompany/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompetitiveCompany.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompetitiveCompany.sln" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/competitive-company" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/icon.psd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/FlowTween.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/lib/FlowTween.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Assets.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Assets.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Compat/LethalConfigCompat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Compat/LethalConfigCompat.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Compat/SoftDependencyHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Compat/SoftDependencyHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Config.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Config.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/ChatPatches.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/ChatPatches.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Combat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Combat.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/DefaultTeams.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/DefaultTeams.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Events/MatchEndedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/MatchEndedContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Events/MatchStartedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/MatchStartedContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Events/RoundEndedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/RoundEndedContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Events/RoundStartedContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Events/RoundStartedContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/LeverPatches.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/LeverPatches.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/MiscPatches.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/MiscPatches.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Players.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Players.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Session.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Session.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/SpectatorController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/SpectatorController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Team.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Team.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game/Teams.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Game/Teams.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Keybinds.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Keybinds.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Log.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Log.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NetworkPrefabs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/NetworkPrefabs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NetworkedSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/NetworkedSettings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Plugin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Plugin.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TerminalCommands.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/TerminalCommands.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/MatchEndScreen/MatchEndScreen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/MatchEndScreen/MatchEndScreen.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/MockTeam.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/MockTeam.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/RoundReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/RoundReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/RoundResultsPage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/RoundResultsPage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/StandingsPage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/StandingsPage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TabButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TabButton.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamPerformanceMember.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamPerformanceMember.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamPerformancePage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamPerformancePage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamResultsPage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamResultsPage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/RoundReport/TeamRoundResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/UI/RoundReport/TeamRoundResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/ColorUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/ColorUtil.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/Emote.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/Emote.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/SuitUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/SuitUtil.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/TerminalUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/TerminalUtil.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/TimeUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/src/Util/TimeUtil.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/thunderstore.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompetitiveCompany/thunderstore.toml" beforeDir="false" afterPath="$PROJECT_DIR$/CompetitiveCompany/thunderstore.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +73,7 @@
       <updated>1725600013069</updated>
       <workItem from="1725600017003" duration="142000" />
       <workItem from="1725600178716" duration="601000" />
-      <workItem from="1725601042192" duration="949000" />
+      <workItem from="1725601042192" duration="1273000" />
     </task>
     <servers />
   </component>

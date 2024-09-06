@@ -18,14 +18,15 @@ Evaisa-HookGenPatcher = "0.0.5"
 
 [build]
 icon = "assets/icon.png"
+readme = "../README.md"
 
 [[build.copy]]
-source = "./../CHANGELOG.md"
-target = "CHANGELOG.md"
+source = "CHANGELOG.md"
+target = "/"
 
 [[build.copy]]
-source = "./../LICENSE.md"
-target = "LICENSE.md"
+source = "../LICENSE.md"
+target = "/"
 
 [[build.copy]]
 source = "bin/Release/netstandard2.1/CompetitiveCompany.dll"
